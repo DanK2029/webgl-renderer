@@ -1,23 +1,17 @@
 import * as React from 'react';
 
-import RendererContext from '../Renderer/Context';
-import { GenerateCube, GenerateTriangle } from '../Renderer/Geometry'
-
 import './SceneEditor.scss';
 
 type EventCallback = (event: any) => void;
 
 interface SceneEditorProps {
-	eventCallback: EventCallback;
+	
 }
 
-export default class SceneEditor extends React.Component<SceneEditorProps> {
+class SceneEditor extends React.Component<SceneEditorProps> {
 
-	private _eventCallback: EventCallback;
-
-	constructor(props: any) {
+	constructor(props: SceneEditorProps) {
 		super(props);
-		this._eventCallback = props.eventCallback.bind(this);
 	}
 
 	addTri() {
@@ -30,4 +24,5 @@ export default class SceneEditor extends React.Component<SceneEditorProps> {
 		);
 	}
 }
-SceneEditor.contextType = RendererContext;
+
+export { SceneEditor };

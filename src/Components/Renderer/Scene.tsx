@@ -1,233 +1,236 @@
-import { mat4, vec3, quat, glMatrix, vec4 } from 'gl-matrix';
+import { vec3, vec4, mat4, quat, glMatrix } from 'gl-matrix';
 
-import { VertexBuffer, VertexBufferLayout, IndexBuffer } from './Buffer';
+import { VertexBuffer, IndexBuffer, VertexBufferLayout } from './Buffer';
 import { ShaderProgram } from './Shader';
-import { Camera } from './Camera';
 
-import { UpdateFunction } from './Types.d';
+type UpdateFunction = (time: number, object: SceneObject | Camera) => void;
 
 class Scene {
 
-    private _dt: number;
-    private _time: number;
+	private _objectList: SceneObject[];
+	private _camera: Camera;
+	private _backgroundColor: vec4;
+	private _deltaTime: number;
+	private _time: number;
 
-    private _objectList: SceneObject[];
-    private _lightList: Light[];
+	constructor(deltaTime: number) {
+		this._objectList = [];
+		this._deltaTime = deltaTime;
+		this._time = 0;
+	}
 
-    private _camera: Camera;
+	get objectList(): SceneObject[] {
+		return this._objectList;
+	}
 
-    constructor(dt: number = 0.01) {
-        this._dt = dt;
-        this._time = 0;
+	set objectList(objectList: SceneObject[]) {
+		this._objectList = objectList;
+	}
 
-        this._objectList = [];
-        this._lightList = [];
-    }
+	get camera(): Camera {
+		return this._camera;
+	}
 
-    addObject(object: SceneObject) {
-        this._objectList.push(object);
-    }
+	set camera(camera: Camera) {
+		this._camera = camera;
+	}
 
-    addObjects(objects: SceneObject[]) {
-        this._objectList = this._objectList.concat(objects);
-    }
+	get backgroundColor(): vec4 {
+		return this._backgroundColor;
+	}
 
-    addLight(light: Light) {
-        this._lightList.push(light);
-    }
+	set backgroundColor(color: vec4) {
+		this._backgroundColor = color;
+	}
 
-    addLights(lights: Light[]) {
-        this._lightList = this._lightList.concat(lights);
-    }
+	get deltaTime(): number {
+		return this._deltaTime;
+	}
 
-    get lightList(): Light[] {
-        return this._lightList;
-    }
+	set deltaTime(deltaTime: number) {
+		this._deltaTime = deltaTime;
+	}
 
-    set lightList(lightList: Light[]) {
-        this._lightList = lightList;
-    }
+	get time(): number {
+		return this._time;
+	}
 
-    get objectList(): SceneObject[] {
-        return this._objectList;
-    }
+	addObject(object: SceneObject) {
+		this._objectList.push(object);
+	}
 
-    set camera(camera: Camera) {
-        this._camera = camera;
-    }
+	tick(): void {
+		this._time += this._deltaTime;
+	}
 
-    get camera(): Camera {
-        return this._camera;
-    }
+	updateFunction() {
+		this.camera.updateFunction(this.time, this.camera);
 
-    get dt(): number {
-        return this._dt;
-    }
-
-    get time(): number {
-        return this._time;
-    }
-
-    updateScene() {
-        this._time += this._dt;
-        
-        this.camera.updateFunction && this.camera.updateFunction(this._time, this.camera);
-
-        this.objectList.forEach((obj) => {
-            obj.updateFuntion && obj.updateFuntion(this._time, obj);
-        });
-    }
+		this.objectList.forEach((obj: SceneObject) => {
+			obj.updateFunction(this.time, obj);
+		});
+		this.tick();
+	}
 }
 
 class SceneObject {
 
-    private _gl: WebGL2RenderingContext;
-    private _name: string;
-    private _color: vec4;
+	private _name: string;
+	private _vertexBuffer: VertexBuffer;
+	private _indexBuffer: IndexBuffer;
+	private _shaderProgram: ShaderProgram;
+	private _translation: vec3;
+	private _scale: vec3;
+	private _rotation: vec3;
+	private _transform: mat4;
+	private _updateFunction: UpdateFunction;
 
-    private _vertexArrayBuffer: WebGLVertexArrayObject;
-    private _vertexBuffer: VertexBuffer;
-    private _vertexBufferLayout: VertexBufferLayout;
+	constructor(vertexBuffer: VertexBuffer, indexBuffer: IndexBuffer, shader: ShaderProgram) {
+		this._vertexBuffer = vertexBuffer;
+		this._indexBuffer = indexBuffer;
+		this._shaderProgram = shader;
+		this._translation = [0, 0, 0];
+		this._scale = [1, 1, 1];
+		this._rotation = [0, 0, 0];
+		this._transform = mat4.create();
+	}
 
-    private _indexBuffer: IndexBuffer;
-    private _indicesLenth: number;
+	get name(): string {
+		return this._name;
+	}
 
-    private _translation: vec3;
-    private _scale: vec3;
-    private _rotation: quat;
-    private _transform: mat4;
+	set name(name: string) {
+		this._name = name;
+	}
 
-    _updateFunction: UpdateFunction;
+	get vertexBuffer(): VertexBuffer {
+		return this._vertexBuffer;
+	}
 
-    constructor(gl: WebGL2RenderingContext, vertices: Float32Array, layout: any,  indices: Uint32Array, color: vec4) {
-        this._gl = gl;
-        this._color = color;
-        this._indicesLenth = indices.length;
-        this._updateFunction = () => {};
+	set vertexBuffer(vertexBuffer: VertexBuffer) {
+		this._vertexBuffer = vertexBuffer;
+	}
 
-        this._vertexArrayBuffer = gl.createVertexArray();
-        gl.bindVertexArray(this._vertexArrayBuffer);
+	get indexBuffer(): IndexBuffer {
+		return this._indexBuffer;
+	}
 
-        this._vertexBuffer = new VertexBuffer(this._gl, vertices);
-        this._vertexBufferLayout = new VertexBufferLayout(this._gl, layout);
-        this._indexBuffer = new IndexBuffer(this._gl, indices);
+	set indexBuffer(vertexBuffer: IndexBuffer) {
+		this._indexBuffer = vertexBuffer;
+	}
 
-        this._translation = [0, 0, 0];
-        this._scale = [1, 1, 1];
-        this._rotation = quat.create();
-        this._transform = mat4.create();
-    }
+	get shaderProgram(): ShaderProgram {
+		return this._shaderProgram;
+	}
 
-    get name(): string {
-        return this._name;
-    }
+	set shaderProgram(shaderProgram: ShaderProgram) {
+		this._shaderProgram = shaderProgram;
+	}
 
-    set name(name: string) {
-        this._name = name;
-    }
+	set translation(vec: vec3) {
+		this._translation = vec;
+	}
 
-    get vertexBuffer(): VertexBuffer {
-        return this._vertexBuffer;
-    }
+	get translation(): vec3 {
+		return this._translation;
+	}
 
-    get indexBuffer(): IndexBuffer {
-        return this._indexBuffer;
-    }
+	set scale(vec: vec3) {
+		this._scale = vec;
+	}
 
-    get vertexBufferLayout(): VertexBufferLayout {
-        return this._vertexBufferLayout;
-    }
+	get scale(): vec3 {
+		return this._scale;
+	}
 
-    parseLayout(shaderProgram: ShaderProgram) {
-        shaderProgram.parseObjectLayout(this);
-    }
+	set rotation(vec: vec3) {
+		this._rotation = vec;
+	}
 
-    set updateFuntion(updateFuntion: UpdateFunction) {
-        this._updateFunction = updateFuntion;
-    }
+	get rotation(): vec3 {
+		return this._rotation;
+	}
 
-    get updateFuntion(): UpdateFunction {
-        return this._updateFunction;
-    }
+	get transform(): mat4 {
+		let rotation: quat = quat.fromEuler(quat.create(), this.rotation[0], this.rotation[1], this.rotation[2]);
+		return mat4.fromRotationTranslationScale(this._transform, rotation, this.translation, this.scale);
+	}
 
-    bind() {
-        this._gl.bindVertexArray(this._vertexArrayBuffer);
-        this.indexBuffer.bind();
-        this.vertexBuffer.bind();
-    }
+	get updateFunction(): UpdateFunction {
+		return this._updateFunction;
+	}
 
-    unbind() {
-        this._gl.bindVertexArray(null);
-        this.indexBuffer.unbind();
-        this.vertexBuffer.unbind();
-    }
-
-    get color(): vec4 {
-        return this._color;
-    }
-
-    set color(color: vec4) {
-        this._color = color;
-    }
-
-    get indicesLenth(): number {
-        return this._indicesLenth;
-    }
-
-    set translation(vec: vec3) {
-        this._translation = vec;
-    }
-
-    get translation(): vec3 {
-        return this._translation;
-    }
-
-    set scale(vec: vec3) {
-        this._scale = vec;
-    }
-
-    get scale(): vec3 {
-        return this._scale;
-    }
-
-    set rotation(vec: vec3 | quat) {
-        let x = vec[0], y = vec[1], z = vec[2];
-
-        glMatrix.toRadian(x);
-        glMatrix.toRadian(y);
-        glMatrix.toRadian(z);
-
-        quat.rotateX(this._rotation, this._rotation, x);
-        quat.rotateY(this._rotation, this._rotation, y);
-        quat.rotateZ(this._rotation, this._rotation, z);
-    }
-
-    get rotation(): quat {
-        return this._rotation;
-    }
-
-    get transform() {
-        return mat4.fromRotationTranslationScale(this._transform, this.rotation, this.translation, this.scale);
-    }
+	set updateFunction(updateFunction: UpdateFunction) {
+		this._updateFunction = updateFunction;
+	}
 }
 
-class Light {
+class Camera {
 
-    _position: vec3;
-    _color: vec4;
+	private _aspectRatio: number;
+	private _perspectiveMatrix: mat4;
+	private _viewMatrix: mat4;
+	private _translation: vec3;
+	private _rotation: vec3;
+	private _transform: mat4;
+	private _updateFunction: UpdateFunction;
 
-    constructor(position: vec3, color: vec4) {
-        this._position = position;
-        this._color = color;
-    }
+	constructor(aspectRatio: number, fovy: number, near: number, far: number) {
+		this._aspectRatio = aspectRatio;
+		this._perspectiveMatrix = mat4.perspective(mat4.create(), glMatrix.toRadian(fovy), this._aspectRatio, near, far);
+		this._translation = vec3.create();
+		this._viewMatrix = mat4.create();
+		this._rotation = [0, 0, 0];
+		this._transform = mat4.create();
+		this._updateFunction = (time: number, cam: Camera) => {};
+	}
 
-    get position() {
-        return this._position;
-    }
+	get aspectRatio(): number {
+		return this._aspectRatio;
+	}
 
-    get color() {
-        return this._color;
-    }
+	set aspectRatio(aspectRatio: number) {
+		this._aspectRatio = aspectRatio;
+	}
+
+	get perspectiveMatrix(): mat4 {
+		return this._perspectiveMatrix;
+	}
+
+	get viewMatrix(): mat4 {
+		let rotation: quat = quat.fromEuler(quat.create(), this._rotation[0], this._rotation[1], this._rotation[2]);
+		mat4.fromRotationTranslation(this._transform, rotation, this._translation);
+		return mat4.invert(this._viewMatrix, this._transform);
+	}
+
+	get translation(): vec3 {
+		return this._translation;
+	}
+
+	set translation(vec: vec3) {
+		this._translation = vec;
+	}
+
+	get rotation(): vec3 {
+		return this._rotation;
+	}
+
+	set rotation(vec: vec3) {
+		this._rotation = vec;
+	}
+
+	get transform(): mat4 {
+		let r: quat = quat.fromEuler(quat.create(), this._rotation[0], this._rotation[1], this._rotation[2]);
+		return mat4.fromRotationTranslation(this._transform, r, this.translation);
+	}
+
+	set updateFunction(updateFuntion: UpdateFunction) {
+		this._updateFunction = updateFuntion;
+	}
+
+	get updateFunction(): UpdateFunction {
+		return this._updateFunction;
+	}
 }
 
-export { Scene, SceneObject, Light };
+export { Scene, SceneObject, Camera };

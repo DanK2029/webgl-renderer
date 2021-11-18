@@ -1,130 +1,126 @@
-import { VertexLayout } from './Types.d'
-
 class VertexBuffer {
 
-    private _gl: WebGL2RenderingContext;
-    private _buffer: WebGLBuffer;
+	private _vertices: Float32Array;
+	private _buffer: WebGLBuffer;
+	private _layout: VertexBufferLayout;
+	private _created: boolean;
 
-    constructor(gl: WebGL2RenderingContext, vertices: Float32Array) {
-        this._gl = gl;
+	constructor(vertices: Float32Array, layout: VertexBufferLayout) {
+		this._vertices = vertices;
+		this._layout = layout;
+	}
 
-        this._buffer = this._gl.createBuffer();
+	get vertices(): Float32Array {
+		return this._vertices;
+	}
 
-        this.bind();
-        gl.bufferData(this._gl.ARRAY_BUFFER, vertices, this._gl.STATIC_DRAW);
-        this.unbind();
-    }
+	set vertices(vertices: Float32Array) {
+		this._vertices = vertices;
+	}
 
-    bind(): void {
-        this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this.buffer);
-    }
+	get buffer(): WebGLBuffer {
+		return this._buffer;
+	}
 
-    unbind(): void {
-        this._gl.bindBuffer(this._gl.ARRAY_BUFFER, null);
-    }
+	set buffer(buffer: WebGLBuffer) {
+		this._buffer = buffer;
+	}
 
-    get buffer(): WebGLBuffer {
-        return this._buffer;
-    }
-}
+	get layout(): VertexBufferLayout {
+		return this._layout;
+	}
 
-class VertexBufferLayout {
+	set layout(layout: VertexBufferLayout) {
+		this._layout = layout;
+	}
 
-    private _gl: WebGL2RenderingContext;
-    private _offset: number;
-    private _layout: VertexLayout[];
+	get created(): boolean {
+		return this._created;
+	}
 
-    constructor(gl: WebGL2RenderingContext, layout: VertexLayout[]) {
-        this._gl = gl;
-        this._offset = 0;
-        
-        layout.forEach((attribute: VertexLayout) => {
-            const { size, type } = attribute;
-            attribute.offset = this._offset;
-            this.offset += this.getTypeSize(type) * size;
-        });
-
-        layout.forEach((attribute) => {
-            attribute.stride = this._offset;
-        });
-
-        this._layout = layout;
-    }
-
-    get layout(): VertexLayout[] {
-        return this._layout;
-    }
-
-    set layout(layout: VertexLayout[]) {
-        this._layout = layout;
-    }
-
-    get offset(): number {
-        return this._offset;
-    }
-
-    set offset(offset: number) {
-        this._offset = offset;
-    }
-
-    getTypeSize(type: number): number {
-        switch (type) {
-            case this._gl.BYTE:
-                return 1;
-
-            case this._gl.UNSIGNED_BYTE:
-                return 1;
-
-            case this._gl.SHORT:
-                return 2;
-                
-            case this._gl.UNSIGNED_SHORT:
-                return 2;
-
-            case this._gl.HALF_FLOAT:
-                return 2;
-
-            case this._gl.FLOAT:
-                return 4;
-
-            default:
-                return 0;
-        }
-    }
-
+	set created(created: boolean) {
+		this._created = created;
+	}
 }
 
 class IndexBuffer {
 
-    private _gl: WebGL2RenderingContext;
-    private _buffer: WebGLBuffer;
-    private _length: number;
+	private _indices: Uint32Array;
+	private _buffer: WebGLBuffer;
+	private _length: number;
+	private _created: boolean;
 
-    constructor(gl: WebGL2RenderingContext, indices: Uint32Array) {
-        this._gl = gl;
-        this._length = indices.length;
-        this._buffer = gl.createBuffer();
-        
-        this.bind();
-        gl.bufferData(this._gl.ELEMENT_ARRAY_BUFFER, indices, this._gl.STATIC_DRAW);
-        this.unbind();
-    }
+	constructor(vertices: Uint32Array) {
+		this._indices = vertices;
+		this._length = vertices.length;
+	}
 
-    bind(): void {
-        this._gl.bindBuffer(this._gl.ELEMENT_ARRAY_BUFFER, this.buffer);
-    }
+	get vertices(): Uint32Array {
+		return this._indices;
+	}
 
-    unbind(): void {
-        this._gl.bindBuffer(this._gl.ELEMENT_ARRAY_BUFFER, null);
-    }
+	set vertices(vertices: Uint32Array) {
+		this._indices = vertices;
+		this._length = vertices.length;
+	}
 
-    get length(): number {
-        return this._length;
-    }
+	get buffer(): WebGLBuffer {
+		return this._buffer;
+	}
 
-    get buffer(): WebGLBuffer {
-        return this._buffer;
-    }
+	set buffer(buffer: WebGLBuffer) {
+		this._buffer = buffer;
+	}
+
+	get length(): number {
+		return this._length;
+	}
+
+	get created(): boolean {
+		return this._created;
+	}
+
+	set created(created: boolean) {
+		this._created = created;
+	}
 }
 
-export { VertexBuffer, VertexBufferLayout, IndexBuffer };
+enum VertexTypes {
+	FLOAT
+}
+
+interface VertexLayout {
+	name: string,
+	size: number,
+	type: VertexTypes,
+	normalized: boolean
+}
+
+class VertexBufferLayout {
+
+	private _layout: VertexLayout[];
+	private _created: boolean;
+
+	constructor(layout: VertexLayout[]) {
+		this._layout = layout;
+	}
+
+	get layout(): VertexLayout[] {
+		return this._layout;
+	}
+
+	get created(): boolean {
+		return this._created;
+	}
+
+	set created(created: boolean) {
+		this._created = created;
+	}
+}
+
+/**
+ * TODO:
+ *  - Create VertexLayoutBuffer without any calls to WebGL
+ */
+
+export { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexLayout, VertexTypes };

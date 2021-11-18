@@ -2,7 +2,8 @@ import * as React from 'react';
 
 import './App.scss'
 
-import { Renderer } from './New_Renderer/Renderer';
+import { Renderer } from './Renderer/Renderer';
+import { SceneEditor } from './SceneEditor/SceneEditor';
 
 export default class App extends React.Component {
 
@@ -18,6 +19,7 @@ export default class App extends React.Component {
 		return (
 			<div id='app-container'>
 				<Renderer></Renderer>
+				<SceneEditor></SceneEditor>
 			</div>
 		);
 	}

@@ -5,16 +5,28 @@ import { Scene, SceneObject } from "./Scene";
 const vertexBuffer: VertexBuffer = new VertexBuffer(
 	new Float32Array([
 		-1, -1, 0,
+		1, 0, 0, 1,
+
 		1, -1, 0,
-		0, 1, 0
+		0, 1, 0, 1,
+
+		0, 1, 0,
+		0, 0, 1, 1
 	]),
-	new VertexBufferLayout([{
-		name: 'position',
-		size: 3,
-		type: VertexTypes.FLOAT,
-		normalized: false,
-		stride: 0
-	}])
+	new VertexBufferLayout([
+		{
+			name: 'position',
+			size: 3,
+			type: VertexTypes.FLOAT,
+			normalized: false
+		},
+		{
+			name: 'color',
+			size: 4,
+			type: VertexTypes.FLOAT,
+			normalized: false
+		},
+	])
 );
 
 const indexBuffer: IndexBuffer = new IndexBuffer(
@@ -39,7 +51,7 @@ const vertexShader: Shader = new Shader(
 
 	void main(void) {
 		v_color = color;
-		v_position = transform * vec4(position, 1.0);
+		v_position = perspective * view * transform * vec4(position, 1.0);
 		gl_Position = v_position;
 	}
 	`,
@@ -54,7 +66,7 @@ const fragmentShader: Shader = new Shader(
 	varying vec4 v_position;
 
 	void main(void) {
-		gl_FragColor = vec4(1, 0, 0, 1);
+		gl_FragColor = v_color;
 	}
 	`,
 	ShaderType.FRAGMENT
