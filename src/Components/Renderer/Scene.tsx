@@ -93,6 +93,7 @@ class SceneObject {
 		this._scale = [1, 1, 1];
 		this._rotation = [0, 0, 0];
 		this._transform = mat4.create();
+		this._updateFunction = (time: number, obj: SceneObject) => {};
 	}
 
 	get name(): string {
@@ -162,6 +163,16 @@ class SceneObject {
 
 	set updateFunction(updateFunction: UpdateFunction) {
 		this._updateFunction = updateFunction;
+	}
+
+	clone(): SceneObject {
+		let clone = new SceneObject(this.vertexBuffer, this.indexBuffer, this.shaderProgram);
+		clone.name = this.name;
+		clone.translation = this.translation;
+		clone.scale = this.scale;
+		clone.rotation = this.rotation;
+		clone.updateFunction = this.updateFunction;
+		return clone;
 	}
 }
 

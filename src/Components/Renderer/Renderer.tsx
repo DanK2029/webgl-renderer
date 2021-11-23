@@ -6,6 +6,7 @@ import { Shader, ShaderProgram, ShaderType } from './Shader';
 import { Scene, SceneObject, Camera } from './Scene';
 
 import { triangle } from './SceneObjects';
+import { SceneContext } from '../SceneContext';
 
 import './Renderer.scss'
 
@@ -17,54 +18,68 @@ export class Renderer extends React.Component<RendererProps> {
 
 	private _gl: WebGL2RenderingContext;
 	private _canvas: React.RefObject<HTMLCanvasElement>;
+	private _container: React.RefObject<HTMLDivElement>;
 
 	constructor(props: RendererProps) {
 		super(props);
 		this._canvas = React.createRef<HTMLCanvasElement>();
+		this._container = React.createRef<HTMLDivElement>();
 	}
 
 	componentDidMount(): void {
 		this._gl = this._canvas.current.getContext('webgl2');
-		const { width, height } = this._canvas.current.getBoundingClientRect();
+		
+		const {width, height} = this._container.current.getBoundingClientRect();
+		this.resizeCanvas(width, height);
+		window.addEventListener('resize', this.onResize.bind(this));
+		
 		const camera: Camera = new Camera(width/height, 90, 0.001, 1000);
 		camera.translation = [0, 0, 1];
-		camera.updateFunction = (time: number, cam: Camera) => {
-			cam.translation = [0, 0, 0];
-			cam.rotation = [0, 0, time * 50];
-			//console.log(cam.transform);
-		};
 
-		const scene: Scene = new Scene(0.01);
+		const scene: Scene = this.context;
 		scene.camera = camera;
 		scene.backgroundColor = [0.48, 0.54, 0.87, 1.0];
-		triangle.translation = [0, 0, -3];
-		triangle.updateFunction = (time: number, obj: SceneObject) => {
-			//obj.translation = [0, 0, 1.1 * Math.sin(time) - 3];
-			//obj.rotation = [time * 10, time * 50, time * 35];
-		};
-		scene.addObject(triangle);
 
-		this.preprocessScene(scene);
 		this.drawScene(scene);
+	}
+
+	onResize(event: Event): any {
+		const {width, height} = this._container.current.getBoundingClientRect();
+		this.resizeCanvas(width, height);
+	}
+
+	resizeCanvas(width: number, height: number): void {
+		this._canvas.current.width = width;
+		this._canvas.current.height = height;
 	}
 
 	render(): React.ReactNode {
 		return (
-			<canvas
-				className='canvasRenderer'
-				ref={this._canvas}
-				width='800' height='500'
-			></canvas>
+			<div id='renderer' ref={this._container}>
+				<canvas className='canvas' ref={this._canvas}
+				></canvas>
+			</div>
+			
 		)
 	}
 
 	preprocessScene(scene: Scene): void {
 		scene.objectList.forEach((obj: SceneObject) => {
-			this.createVertexBuffer(obj.vertexBuffer);
-			this.createIndexBuffer(obj.indexBuffer);
-			this.createShaderProgram(obj.shaderProgram);
+			if (!obj.vertexBuffer.created) {
+				this.createVertexBuffer(obj.vertexBuffer);
+			}
 
-			this.setVertexAttributes(obj.shaderProgram, obj.vertexBuffer.layout);
+			if (!obj.indexBuffer.created) {
+				this.createIndexBuffer(obj.indexBuffer);
+			}
+			
+			if (!obj.shaderProgram.created) {
+				this.createShaderProgram(obj.shaderProgram);
+			}
+
+			if (!obj.vertexBuffer.layout.created) {
+				this.setVertexAttributes(obj.shaderProgram, obj.vertexBuffer.layout);
+			}
 		});
 
 		this.setClearColor(scene.backgroundColor);
@@ -75,6 +90,8 @@ export class Renderer extends React.Component<RendererProps> {
 
 	drawScene(scene: Scene): void {
 		this.clear(this._gl.COLOR_BUFFER_BIT);
+
+		this.preprocessScene(scene);
 
 		scene.updateFunction();
 
@@ -252,5 +269,7 @@ export class Renderer extends React.Component<RendererProps> {
 
 			offset += this.getTypeSize(type) * size;
 		});
+		vertexLayout.created = true;
 	}
 }
+Renderer.contextType = SceneContext;

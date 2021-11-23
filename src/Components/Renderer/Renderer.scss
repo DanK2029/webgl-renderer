@@ -1,5 +1,9 @@
-.canvasRenderer {
-	outline: 7px;
-	outline-color: rgb(14, 136, 14);
-	outline-style: solid;
+#renderer {
+	$renderer-color: rgb(200, 200, 200);
+	background-color: $renderer-color;
+
+	.canvas {
+		width: 100%;
+		height: 100%;
+	}
 }
