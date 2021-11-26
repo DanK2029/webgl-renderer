@@ -22,11 +22,17 @@ export default class App extends React.Component {
 
 	render() {
 		return (
-			<div className='container'>
-				<SceneContext.Provider value={new Scene(this._deltaTime)}>
-					<Renderer></Renderer>
-					<SceneEditor></SceneEditor>
-				</SceneContext.Provider>
+			<div className='container-fluid'>
+				<div className='row'>
+					<SceneContext.Provider value={new Scene(this._deltaTime)}>
+						<div className='col-9'>
+							<Renderer></Renderer>
+						</div>
+						<div className='col-3'>
+							<SceneEditor></SceneEditor>
+						</div>
+					</SceneContext.Provider>
+				</div>
 			</div>
 		);
 	}

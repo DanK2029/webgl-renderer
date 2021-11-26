@@ -1,7 +1,17 @@
-.scene-editor {
-	float: right;
+@import '../Colors.scss';
+
+.obj-list {
+	overflow-y: scroll;
+	max-height: 100%;
+}
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
 }
 
-#add-tri-button {
-	background-color: red;
+#add-tri {
+	width: 100%;
+	color: $dark-gray;
+	background-color: $bright-green;
+	border-color: $bright-green;
 }

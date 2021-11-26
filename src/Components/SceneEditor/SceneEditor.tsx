@@ -5,12 +5,15 @@ import { SceneContext } from '../SceneContext';
 import { Scene, SceneObject } from '../Renderer/Scene';
 import { triangle } from '../Renderer/SceneObjects';
 
+import { SceneObjectEditor } from './SceneObjectEditor';
+
+import 'bootstrap'
 import './SceneEditor.scss';
 
 type EventCallback = (event: any) => void;
 
 interface SceneEditorProps {
-
+	
 }
 
 class SceneEditor extends React.Component<SceneEditorProps> {
@@ -19,14 +22,11 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 
 	constructor(props: SceneEditorProps) {
 		super(props);
-		this.state = {
-			scene: undefined
-		}
 	}
 
 	componentDidMount(): void {
-		console.log(this.state);
 		this._scene = this.context;
+		this.addTri();
 	}
 
 	addTri() {
@@ -44,18 +44,12 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 	render() {
 		return (
 			<div className='scene-editor'>
-				<button className='btn btn-primary' onClick={this.addTri.bind(this)}>Add Triangle</button>
-				<ul>
-				{this._scene && this._scene.objectList.map((obj: SceneObject) => (
-					<React.Fragment>
-						<li>
-							<div>Name: {obj.name}</div>
-							<div>Position: {obj.translation}</div>
-						</li>
-					</React.Fragment>
-				))}
-				</ul>
-				
+				<button id="add-tri"className='btn btn-primary' onClick={this.addTri.bind(this)}>Add Triangle</button>
+				<div className='obj-list'>
+					{this._scene && this._scene.objectList.map((obj: SceneObject) => (
+						<SceneObjectEditor key={obj.id} object={obj}></SceneObjectEditor>
+					))}
+				</div>
 			</div>
 		);
 	}

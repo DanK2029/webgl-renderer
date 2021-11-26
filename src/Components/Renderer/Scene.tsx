@@ -1,4 +1,5 @@
 import { vec3, vec4, mat4, quat, glMatrix } from 'gl-matrix';
+import * as uniqid from 'uniqid'
 
 import { VertexBuffer, IndexBuffer, VertexBufferLayout } from './Buffer';
 import { ShaderProgram } from './Shader';
@@ -76,6 +77,7 @@ class Scene {
 class SceneObject {
 
 	private _name: string;
+	private _id: string;
 	private _vertexBuffer: VertexBuffer;
 	private _indexBuffer: IndexBuffer;
 	private _shaderProgram: ShaderProgram;
@@ -86,6 +88,7 @@ class SceneObject {
 	private _updateFunction: UpdateFunction;
 
 	constructor(vertexBuffer: VertexBuffer, indexBuffer: IndexBuffer, shader: ShaderProgram) {
+		this._id = uniqid();
 		this._vertexBuffer = vertexBuffer;
 		this._indexBuffer = indexBuffer;
 		this._shaderProgram = shader;
@@ -102,6 +105,10 @@ class SceneObject {
 
 	set name(name: string) {
 		this._name = name;
+	}
+
+	get id(): string {
+		return this._id;
 	}
 
 	get vertexBuffer(): VertexBuffer {

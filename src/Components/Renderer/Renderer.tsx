@@ -28,11 +28,15 @@ export class Renderer extends React.Component<RendererProps> {
 
 	componentDidMount(): void {
 		this._gl = this._canvas.current.getContext('webgl2');
+		if (!this._gl) {
+			throw new Error('WebGL context not set!');
+		}
 		
 		const {width, height} = this._container.current.getBoundingClientRect();
-		this.resizeCanvas(width, height);
-		window.addEventListener('resize', this.onResize.bind(this));
-		
+		this.resizeCanvas(width, height);		
+		this._canvas.current.addEventListener('resize', this.onResize.bind(this));
+
+
 		const camera: Camera = new Camera(width/height, 90, 0.001, 1000);
 		camera.translation = [0, 0, 1];
 
@@ -44,7 +48,8 @@ export class Renderer extends React.Component<RendererProps> {
 	}
 
 	onResize(event: Event): any {
-		const {width, height} = this._container.current.getBoundingClientRect();
+		const width: number = this._container.current.clientWidth;
+		const height: number = this._container.current.clientHeight;
 		this.resizeCanvas(width, height);
 	}
 
@@ -55,9 +60,8 @@ export class Renderer extends React.Component<RendererProps> {
 
 	render(): React.ReactNode {
 		return (
-			<div id='renderer' ref={this._container}>
-				<canvas className='canvas' ref={this._canvas}
-				></canvas>
+			<div className='renderer' ref={this._container}>
+				<canvas className='canvas' ref={this._canvas}></canvas>
 			</div>
 			
 		)

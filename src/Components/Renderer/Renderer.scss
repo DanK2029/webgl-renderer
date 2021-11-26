@@ -1,9 +1,15 @@
-#renderer {
-	$renderer-color: rgb(200, 200, 200);
-	background-color: $renderer-color;
+@import '../Colors.scss';
 
-	.canvas {
-		width: 100%;
-		height: 100%;
-	}
+.renderer {
+	height: 98%;
+}
+
+.canvas {
+	width: 100%;
+	height: 100%;
+
+	border-radius: 5px;
+	border-width: 2px;
+	border-color: $bright-green;
+	border-style: solid;
 }

@@ -1,4 +1,17 @@
-#renderer {
+@import './Colors.scss';
 
-	
+html, body, .container-fluid, .row, #app {
+	height: 100%;
+}
+
+body {
+	background-color: $dark-gray !important;
+}
+
+.col-9 {
+	padding: 5px !important;
+}
+
+.col-3 {
+	padding: 5px !important;
 }

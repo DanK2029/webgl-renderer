@@ -1,0 +1,9 @@
+.card {
+	$card-spacing: 3px;
+	margin-top: $card-spacing;
+	margin-bottom: $card-spacing;
+}
+
+.card-body {
+	padding: 5px 10px 5px 10px !important;
+}
