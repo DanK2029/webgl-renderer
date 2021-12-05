@@ -1,6 +1,6 @@
-import { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexTypes } from "./Buffer";
-import { Shader, ShaderProgram, ShaderType } from "./Shader";
-import { Scene, SceneObject } from "./Scene";
+import { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexTypes } from "../Buffer";
+import { Shader, ShaderProgram, ShaderType } from "../Shader";
+import { SceneObject } from "../Scene";
 
 const vertexBuffer: VertexBuffer = new VertexBuffer(
 	new Float32Array([
@@ -78,3 +78,5 @@ const triangle: SceneObject = new SceneObject(vertexBuffer, indexBuffer, shaderP
 triangle.name = 'Triangle';
 
 export { triangle };
+
+

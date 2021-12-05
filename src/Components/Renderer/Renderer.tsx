@@ -5,7 +5,7 @@ import { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexLayout, VertexType
 import { Shader, ShaderProgram, ShaderType } from './Shader';
 import { Scene, SceneObject, Camera } from './Scene';
 
-import { triangle } from './SceneObjects';
+import { triangle } from './TestObjects/Triangle';
 import { SceneContext } from '../SceneContext';
 
 import './Renderer.scss'
@@ -63,7 +63,6 @@ export class Renderer extends React.Component<RendererProps> {
 			<div className='renderer' ref={this._container}>
 				<canvas className='canvas' ref={this._canvas}></canvas>
 			</div>
-			
 		)
 	}
 
@@ -92,12 +91,13 @@ export class Renderer extends React.Component<RendererProps> {
 		this.setViewport();
 	}
 
+	// ~~~~~ DRAW SCENE ~~~~~
 	drawScene(scene: Scene): void {
 		this.clear(this._gl.COLOR_BUFFER_BIT);
 
-		this.preprocessScene(scene);
-
 		scene.updateFunction();
+
+		this.preprocessScene(scene);
 
 		const cam: Camera = scene.camera;
 		
@@ -145,7 +145,7 @@ export class Renderer extends React.Component<RendererProps> {
 		buffer.buffer = this._gl.createBuffer();
 		buffer.created = true;
 		this.bindIndexBuffer(buffer);
-		this._gl.bufferData(this._gl.ELEMENT_ARRAY_BUFFER, buffer.vertices, this._gl.STATIC_DRAW);
+		this._gl.bufferData(this._gl.ELEMENT_ARRAY_BUFFER, buffer.indices, this._gl.STATIC_DRAW);
 	}
 
 	bindIndexBuffer(buffer: IndexBuffer): void {
@@ -161,7 +161,7 @@ export class Renderer extends React.Component<RendererProps> {
 	}
 
 	createShader(shader: Shader): void {
-		const shaderType = shader.type === ShaderType.FRAGMENT 
+		const shaderType: ShaderType = shader.type === ShaderType.FRAGMENT 
 			? this._gl.FRAGMENT_SHADER
 			: this._gl.VERTEX_SHADER;
 
@@ -228,6 +228,7 @@ export class Renderer extends React.Component<RendererProps> {
 
 	bindSceneObject(obj: SceneObject): void {
 		this.bindVertexBuffer(obj.vertexBuffer);
+		this.setVertexAttributes(obj.shaderProgram, obj.vertexBuffer.layout);
 		this.bindIndexBuffer(obj.indexBuffer);
 		this.useProgram(obj.shaderProgram);
 	}
@@ -256,6 +257,7 @@ export class Renderer extends React.Component<RendererProps> {
 		}
 	}
 
+	// TODO: create two functions one for creation and the other for render loop useage 
 	setVertexAttributes(shaderProgram: ShaderProgram, vertexLayout: VertexBufferLayout): void {
 		this.useProgram(shaderProgram);
 		let offset: number = 0;

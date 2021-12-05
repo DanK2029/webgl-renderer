@@ -8,6 +8,7 @@ class VertexBuffer {
 	constructor(vertices: Float32Array, layout: VertexBufferLayout) {
 		this._vertices = vertices;
 		this._layout = layout;
+		this._created = false;
 	}
 
 	get vertices(): Float32Array {
@@ -41,6 +42,12 @@ class VertexBuffer {
 	set created(created: boolean) {
 		this._created = created;
 	}
+
+	clone(): VertexBuffer {
+		const clonedVertexLayout: VertexBufferLayout = this.layout.clone();
+		let clonedVertexBuffer = new VertexBuffer(this.vertices, clonedVertexLayout);
+		return clonedVertexBuffer;
+	}
 }
 
 class IndexBuffer {
@@ -50,16 +57,17 @@ class IndexBuffer {
 	private _length: number;
 	private _created: boolean;
 
-	constructor(vertices: Uint32Array) {
-		this._indices = vertices;
-		this._length = vertices.length;
+	constructor(indices: Uint32Array) {
+		this._indices = indices;
+		this._length = indices.length;
+		this._created = false;
 	}
 
-	get vertices(): Uint32Array {
+	get indices(): Uint32Array {
 		return this._indices;
 	}
 
-	set vertices(vertices: Uint32Array) {
+	set indices(vertices: Uint32Array) {
 		this._indices = vertices;
 		this._length = vertices.length;
 	}
@@ -83,6 +91,11 @@ class IndexBuffer {
 	set created(created: boolean) {
 		this._created = created;
 	}
+
+	clone(): IndexBuffer {
+		let clonedIndexBuffer = new IndexBuffer(this.indices);
+		return clonedIndexBuffer;
+	}
 }
 
 enum VertexTypes {
@@ -103,6 +116,7 @@ class VertexBufferLayout {
 
 	constructor(layout: VertexLayout[]) {
 		this._layout = layout;
+		this._created = false;
 	}
 
 	get layout(): VertexLayout[] {
@@ -116,11 +130,11 @@ class VertexBufferLayout {
 	set created(created: boolean) {
 		this._created = created;
 	}
-}
 
-/**
- * TODO:
- *  - Create VertexLayoutBuffer without any calls to WebGL
- */
+	clone(): VertexBufferLayout {
+		let clonedVertexBufferLayout: VertexBufferLayout = new VertexBufferLayout(this.layout);
+		return clonedVertexBufferLayout;
+	}
+}
 
 export { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexLayout, VertexTypes };

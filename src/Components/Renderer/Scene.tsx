@@ -65,10 +65,14 @@ class Scene {
 	}
 
 	updateFunction() {
-		this.camera.updateFunction(this.time, this.camera);
+		if (this.camera && this.camera.updateFunction) {
+			this.camera.updateFunction(this.time, this.camera);
+		}
 
 		this.objectList.forEach((obj: SceneObject) => {
-			obj.updateFunction(this.time, obj);
+			if (obj.updateFunction) {
+				obj.updateFunction(this.time, obj);
+			}
 		});
 		this.tick();
 	}
@@ -173,7 +177,7 @@ class SceneObject {
 	}
 
 	clone(): SceneObject {
-		let clone = new SceneObject(this.vertexBuffer, this.indexBuffer, this.shaderProgram);
+		let clone = new SceneObject(this.vertexBuffer.clone(), this.indexBuffer.clone(), this.shaderProgram.clone());
 		clone.name = this.name;
 		clone.translation = this.translation;
 		clone.scale = this.scale;

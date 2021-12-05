@@ -13,6 +13,7 @@ class Shader {
     constructor(source: string, type: ShaderType) {
         this._source = source;
         this._type = type;
+		this._created = false;
     }
 
     get source(): string {
@@ -46,6 +47,11 @@ class Shader {
     set created(created: boolean) {
         this._created = created;
     }
+
+	clone(): Shader {
+		let clonedShader: Shader = new Shader(this.source, this.type);
+		return clonedShader;
+	}
 }
 
 class ShaderProgram {
@@ -58,6 +64,7 @@ class ShaderProgram {
     constructor(vertexShader: Shader, fragmentShader: Shader) {
         this._vertexShader = vertexShader;
         this._fragmentShader = fragmentShader;
+		this._created = false;
     }
 
     get program(): WebGLProgram {
@@ -91,6 +98,13 @@ class ShaderProgram {
     set created(created: boolean) {
         this._created = created;
     }
+
+	clone(): ShaderProgram {
+		const clonedVertexShader: Shader = this.vertexShader.clone();
+		const clonedFragmentShader: Shader = this.fragmentShader.clone();
+		let clonedShaderProgram: ShaderProgram = new ShaderProgram(clonedVertexShader, clonedFragmentShader);
+		return clonedShaderProgram;
+	}
 }
 
 export { Shader, ShaderProgram, ShaderType }
