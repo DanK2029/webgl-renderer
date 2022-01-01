@@ -4,29 +4,10 @@ import { SceneObject } from "../Scene";
 
 const vertexBuffer: VertexBuffer = new VertexBuffer(
 	new Float32Array([
-		 1,  1,  1,
-		 0.86, 0.45, 0.25, 1,
-
-		 1,  1, -1,
-		 0.86, 0.86, 0.25, 1,
-
-		 1, -1,  1,
-		 0.25, 0.86, 0.25, 1,
-		 
-		 1, -1, -1,
-		 0.45, 0.86, 0.86, 1,
-
-		-1,  1,  1,
-		0.25, 0.25, 0.86, 1,
-
-		-1,  1, -1,
-		0.86, 0.45, 0.86, 1,
-
-		-1, -1,  1,
-		0.45, 0.25, 0.45, 1,
-
-		-1, -1, -1,
-		0.86, 0.86, 0.86, 1,
+		-1, 1, 0,
+		1, 1, 0,
+		1, -1, 0,
+		-1, -1, 0,
 	]),
 	new VertexBufferLayout([
 		{
@@ -34,35 +15,14 @@ const vertexBuffer: VertexBuffer = new VertexBuffer(
 			size: 3,
 			type: VertexTypes.FLOAT,
 			normalized: false
-		},
-		{
-			name: 'color',
-			size: 4,
-			type: VertexTypes.FLOAT,
-			normalized: false
-		},
+		}
 	])
 );
 
 const indexBuffer: IndexBuffer = new IndexBuffer(
 	new Uint32Array([
-		1, 0, 2,
-		1, 2, 3,
-
-		0, 4, 6,
-		0, 6, 2,
-
-		4, 5, 7,
-		4, 7, 6,
-
-		5, 1, 3,
-		5, 3, 7,
-
-		1, 5, 4,
-		1, 4, 0,
-
-		2, 6, 7,
-		2, 7, 3,
+		2, 1, 0,
+		3, 2, 0,
 	])
 );
 
@@ -71,7 +31,6 @@ const vertexShader: Shader = new Shader(
 	precision mediump float;
 
 	attribute vec3 position;
-	attribute vec4 color;
 
 	uniform mat4 transform;
 	uniform mat4 perspective;
@@ -81,7 +40,6 @@ const vertexShader: Shader = new Shader(
 	varying vec4 v_position;
 
 	void main(void) {
-		v_color = color;
 		v_position = perspective * view * transform * vec4(position, 1.0);
 		gl_Position = v_position;
 	}
@@ -97,7 +55,7 @@ const fragmentShader: Shader = new Shader(
 	varying vec4 v_position;
 
 	void main(void) {
-		gl_FragColor = v_color;
+		gl_FragColor = vec4(0.85, 0.45, 0.33, 1.0);
 	}
 	`,
 	ShaderType.FRAGMENT
@@ -105,9 +63,7 @@ const fragmentShader: Shader = new Shader(
 
 const shaderProgram: ShaderProgram = new ShaderProgram(vertexShader, fragmentShader);
 
-const cube: SceneObject = new SceneObject(vertexBuffer, indexBuffer, shaderProgram);
-cube.name = 'Cube';
+const square: SceneObject = new SceneObject(vertexBuffer, indexBuffer, shaderProgram);
+square.name = 'Square';
 
-export { cube };
-
-
+export { square };

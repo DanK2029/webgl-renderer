@@ -3,8 +3,10 @@ import * as React from 'react';
 import { SceneContext } from '../SceneContext';
 
 import { Scene, SceneObject } from '../Renderer/Scene';
+
 import { triangle } from '../Renderer/TestObjects/Triangle';
 import { cube } from '../Renderer/TestObjects/Cube';
+import { square } from '../Renderer/TestObjects/Square';
 
 import { SceneObjectEditor } from './SceneObjectEditor';
 
@@ -27,8 +29,6 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 
 	componentDidMount(): void {
 		this._scene = this.context;
-		this.addCube('cube 1');
-		this.addTri('Tri 1');
 	}
 
 	addTri(name: string = 'New Tri') {
@@ -38,6 +38,7 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 
 		let tri: SceneObject = triangle.clone();
 		tri.name = name;
+		tri.translation = [0, 0, -3];
 		tri.translation = [rand(-1, 1), rand(-1, 1), rand(-5, -3)];
 		tri.rotation = [rand(0, 360), rand(0, 360), rand(0, 360)];
 		
@@ -57,12 +58,14 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 
 		let c: SceneObject = cube.clone();
 		c.name = name;
+		c.translation = [0, 0, -3];
+		
 		c.translation = [rand(-1, 1), rand(-1, 1), rand(-5, -3)];
 		const r = [rand(0, 360), rand(0, 360), rand(0, 360)];
 		c.rotation = [rand(0, 360), rand(0, 360), rand(0, 360)];
 		c.updateFunction = (time: number, obj: SceneObject) => {
 			const c = 100;
-			obj.rotation = [time * r[0], time * r[1], time * r[2]];
+			obj.rotation = [r[0] * time, r[1] * time, r[2] * time];
 		}
 
 		this._scene.addObject(c);

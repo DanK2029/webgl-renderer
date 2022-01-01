@@ -32,7 +32,7 @@ export class Renderer extends React.Component<RendererProps> {
 			throw new Error('WebGL context not set!');
 		}
 		
-		const {width, height} = this._container.current.getBoundingClientRect();
+		const { width, height } = this._container.current.getBoundingClientRect();
 		this.resizeCanvas(width, height);		
 		this._canvas.current.addEventListener('resize', this.onResize.bind(this));
 
@@ -109,7 +109,7 @@ export class Renderer extends React.Component<RendererProps> {
 			this.setUniform4Mat(shader, 'view', cam.viewMatrix);
 			this.setUniform4Mat(shader, 'transform', obj.transform);
 
-			this.drawElements(this._gl.TRIANGLES, obj.indexBuffer.length, this._gl.UNSIGNED_SHORT);
+			this.drawElements(this._gl.TRIANGLES, obj.indexBuffer.length, this._gl.UNSIGNED_INT);
 			this.unbindSceneObject();
 		})
 
@@ -257,7 +257,7 @@ export class Renderer extends React.Component<RendererProps> {
 		}
 	}
 
-	// TODO: create two functions one for creation and the other for render loop useage 
+	// TODO: change function so vertexAttribPointer parameters can be stored locally including stride on total layout
 	setVertexAttributes(shaderProgram: ShaderProgram, vertexLayout: VertexBufferLayout): void {
 		this.useProgram(shaderProgram);
 		let offset: number = 0;

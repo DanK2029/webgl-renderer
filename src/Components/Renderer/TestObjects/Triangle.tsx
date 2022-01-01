@@ -4,6 +4,7 @@ import { SceneObject } from "../Scene";
 
 const vertexBuffer: VertexBuffer = new VertexBuffer(
 	new Float32Array([
+		// x, y, z
 		-1, -1, 0,
 		1, 0, 0, 1,
 
