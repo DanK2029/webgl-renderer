@@ -1,6 +1,8 @@
 import { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexTypes } from "../Buffer";
 import { Shader, ShaderProgram, ShaderType } from "../Shader";
+import { Material, MaterialPropertyType } from "../Material"
 import { SceneObject } from "../Scene";
+import { vec4 } from "gl-matrix";
 
 const vertexBuffer: VertexBuffer = new VertexBuffer(
 	new Float32Array([
@@ -71,11 +73,12 @@ const vertexShader: Shader = new Shader(
 	precision mediump float;
 
 	attribute vec3 position;
-	attribute vec4 color;
 
 	uniform mat4 transform;
 	uniform mat4 perspective;
 	uniform mat4 view;
+
+	uniform vec4 color;
 
 	varying vec4 v_color;
 	varying vec4 v_position;
@@ -105,7 +108,15 @@ const fragmentShader: Shader = new Shader(
 
 const shaderProgram: ShaderProgram = new ShaderProgram(vertexShader, fragmentShader);
 
-const cube: SceneObject = new SceneObject(vertexBuffer, indexBuffer, shaderProgram);
+const material: Material = new Material(shaderProgram, [
+	{
+		type: MaterialPropertyType.VEC4,
+		name: 'color',
+		value: [0.86, 0.34, 0.56, 1]
+	}
+])
+
+const cube: SceneObject = new SceneObject(vertexBuffer, indexBuffer, material);
 cube.name = 'Cube';
 
 export { cube };

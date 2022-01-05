@@ -1,5 +1,6 @@
 import { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexTypes } from "../Buffer";
 import { Shader, ShaderProgram, ShaderType } from "../Shader";
+import { Material, MaterialPropertyType } from "../Material";
 import { SceneObject } from "../Scene";
 
 const vertexBuffer: VertexBuffer = new VertexBuffer(
@@ -63,7 +64,15 @@ const fragmentShader: Shader = new Shader(
 
 const shaderProgram: ShaderProgram = new ShaderProgram(vertexShader, fragmentShader);
 
-const square: SceneObject = new SceneObject(vertexBuffer, indexBuffer, shaderProgram);
+const material: Material = new Material(shaderProgram, [
+	{
+		type: MaterialPropertyType.VEC4,
+		name: 'color',
+		value: [1, 0, 0, 1]
+	}
+])
+
+const square: SceneObject = new SceneObject(vertexBuffer, indexBuffer, material);
 square.name = 'Square';
 
 export { square };

@@ -3,6 +3,7 @@ import { vec3, vec4, mat4, quat } from 'gl-matrix';
 
 import { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexLayout, VertexTypes}  from './Buffer';
 import { Shader, ShaderProgram, ShaderType } from './Shader';
+import { Material, MaterialProperty, MaterialPropertyType } from './Material';
 import { Scene, SceneObject, Camera } from './Scene';
 
 import { triangle } from './TestObjects/Triangle';
@@ -76,12 +77,12 @@ export class Renderer extends React.Component<RendererProps> {
 				this.createIndexBuffer(obj.indexBuffer);
 			}
 			
-			if (!obj.shaderProgram.created) {
-				this.createShaderProgram(obj.shaderProgram);
+			if (!obj.material.program.created) {
+				this.createShaderProgram(obj.material.program);
 			}
 
 			if (!obj.vertexBuffer.layout.created) {
-				this.setVertexAttributes(obj.shaderProgram, obj.vertexBuffer.layout);
+				this.setVertexAttributes(obj.material.program, obj.vertexBuffer.layout);
 			}
 		});
 
@@ -104,10 +105,10 @@ export class Renderer extends React.Component<RendererProps> {
 		scene.objectList.forEach((obj: SceneObject) => {
 			this.bindSceneObject(obj);
 
-			const shader: ShaderProgram = obj.shaderProgram;
-			this.setUniform4Mat(shader, 'perspective', cam.perspectiveMatrix);
-			this.setUniform4Mat(shader, 'view', cam.viewMatrix);
-			this.setUniform4Mat(shader, 'transform', obj.transform);
+			const shaderProgram: ShaderProgram = obj.material.program;
+			this.setUniform4Mat(shaderProgram, 'perspective', cam.perspectiveMatrix);
+			this.setUniform4Mat(shaderProgram, 'view', cam.viewMatrix);
+			this.setUniform4Mat(shaderProgram, 'transform', obj.transform);
 
 			this.drawElements(this._gl.TRIANGLES, obj.indexBuffer.length, this._gl.UNSIGNED_INT);
 			this.unbindSceneObject();
@@ -210,6 +211,23 @@ export class Renderer extends React.Component<RendererProps> {
 		this._gl.uniformMatrix4fv(location, false, mat4);
 	}
 
+	setMaterial(material: Material) {
+		const shaderProgram: ShaderProgram = material.program;
+		this.useProgram(shaderProgram);
+
+		material.properties.forEach((property: MaterialProperty) => {
+			const { name, value } = property;
+			switch (property.type) {
+				case MaterialPropertyType.VEC4:
+					this.setUniform4f(shaderProgram, name, value);
+					break;
+
+				case MaterialPropertyType.MAT4:
+					this.setUniform4Mat(shaderProgram, name, value);
+			}
+		})
+	}
+
 	setClearColor(color: vec4): void {
 		this._gl.clearColor(color[0], color[1], color[2], color[3]);
 	}
@@ -228,9 +246,9 @@ export class Renderer extends React.Component<RendererProps> {
 
 	bindSceneObject(obj: SceneObject): void {
 		this.bindVertexBuffer(obj.vertexBuffer);
-		this.setVertexAttributes(obj.shaderProgram, obj.vertexBuffer.layout);
+		this.setVertexAttributes(obj.material.program, obj.vertexBuffer.layout);
 		this.bindIndexBuffer(obj.indexBuffer);
-		this.useProgram(obj.shaderProgram);
+		this.setMaterial(obj.material);
 	}
 
 	unbindSceneObject(): void {

@@ -2,7 +2,7 @@ import { vec3, vec4, mat4, quat, glMatrix } from 'gl-matrix';
 import * as uniqid from 'uniqid'
 
 import { VertexBuffer, IndexBuffer, VertexBufferLayout } from './Buffer';
-import { ShaderProgram } from './Shader';
+import { Material } from './Material';
 
 type UpdateFunction = (time: number, object: SceneObject | Camera) => void;
 
@@ -84,18 +84,18 @@ class SceneObject {
 	private _id: string;
 	private _vertexBuffer: VertexBuffer;
 	private _indexBuffer: IndexBuffer;
-	private _shaderProgram: ShaderProgram;
+	private _material: Material;
 	private _translation: vec3;
 	private _scale: vec3;
 	private _rotation: vec3;
 	private _transform: mat4;
 	private _updateFunction: UpdateFunction;
 
-	constructor(vertexBuffer: VertexBuffer, indexBuffer: IndexBuffer, shader: ShaderProgram) {
+	constructor(vertexBuffer: VertexBuffer, indexBuffer: IndexBuffer, material: Material) {
 		this._id = uniqid();
 		this._vertexBuffer = vertexBuffer;
 		this._indexBuffer = indexBuffer;
-		this._shaderProgram = shader;
+		this._material = material;
 		this._translation = [0, 0, 0];
 		this._scale = [1, 1, 1];
 		this._rotation = [0, 0, 0];
@@ -131,12 +131,12 @@ class SceneObject {
 		this._indexBuffer = vertexBuffer;
 	}
 
-	get shaderProgram(): ShaderProgram {
-		return this._shaderProgram;
+	get material(): Material {
+		return this._material;
 	}
 
-	set shaderProgram(shaderProgram: ShaderProgram) {
-		this._shaderProgram = shaderProgram;
+	set shaderProgram(material: Material) {
+		this._material = material;
 	}
 
 	set translation(vec: vec3) {
@@ -177,7 +177,7 @@ class SceneObject {
 	}
 
 	clone(): SceneObject {
-		let clone = new SceneObject(this.vertexBuffer.clone(), this.indexBuffer.clone(), this.shaderProgram.clone());
+		let clone = new SceneObject(this.vertexBuffer.clone(), this.indexBuffer.clone(), this.material.clone());
 		clone.name = this.name;
 		clone.translation = this.translation;
 		clone.scale = this.scale;
