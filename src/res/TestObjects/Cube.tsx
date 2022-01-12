@@ -1,8 +1,7 @@
-import { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexTypes } from "../Buffer";
-import { Shader, ShaderProgram, ShaderType } from "../Shader";
-import { Material, MaterialPropertyType } from "../Material"
-import { SceneObject } from "../Scene";
-import { vec4 } from "gl-matrix";
+import { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexTypes } from '../../Renderer/Buffer';
+import { Shader, ShaderProgram, ShaderType } from '../../Renderer/Shader';
+import { Material, MaterialPropertyType } from '../../Renderer/Material';
+import { SceneObject } from '../../Renderer/Scene';
 
 const vertexBuffer: VertexBuffer = new VertexBuffer(
 	new Float32Array([

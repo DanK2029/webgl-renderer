@@ -3,11 +3,11 @@ import * as React from 'react';
 import 'bootstrap'
 import './App.scss'
 
-import { Renderer } from './Renderer/Renderer';
-import { Scene } from './Renderer/Scene';
-import { SceneEditor } from './SceneEditor/SceneEditor';
+import { ViewEditor } from '../ViewEditor/ViewEditor';
+import { Scene } from '../../Renderer/Scene';
+import { SceneEditor } from '../SceneEditor/SceneEditor';
 
-import { SceneContext } from './SceneContext';
+import { SceneContext } from '../Context/SceneContext';
 export default class App extends React.Component {
 
 	private _deltaTime: number = 0.01;
@@ -26,7 +26,7 @@ export default class App extends React.Component {
 				<div className='row'>
 					<SceneContext.Provider value={new Scene(this._deltaTime)}>
 						<div className='col-9'>
-							<Renderer></Renderer>
+							<ViewEditor></ViewEditor>
 						</div>
 						<div className='col-3'>
 							<SceneEditor></SceneEditor>

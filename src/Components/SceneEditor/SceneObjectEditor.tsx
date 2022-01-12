@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { SceneObject } from '../Renderer/Scene';
+import { SceneObject } from '../../Renderer/Scene';
 
 import 'bootstrap'
 import './SceneObjectEditor.scss'

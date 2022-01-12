@@ -1,14 +1,19 @@
-import { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexTypes } from "../Buffer";
-import { Shader, ShaderProgram, ShaderType } from "../Shader";
-import { Material, MaterialPropertyType } from "../Material";
-import { SceneObject } from "../Scene";
+import { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexTypes } from '../../Renderer/Buffer';
+import { Shader, ShaderProgram, ShaderType } from '../../Renderer/Shader';
+import { Material, MaterialPropertyType } from '../../Renderer/Material';
+import { SceneObject } from '../../Renderer/Scene';
 
 const vertexBuffer: VertexBuffer = new VertexBuffer(
 	new Float32Array([
-		-1, 1, 0,
-		1, 1, 0,
-		1, -1, 0,
+		// x, y, z
 		-1, -1, 0,
+		1, 0, 0, 1,
+
+		1, -1, 0,
+		0, 1, 0, 1,
+
+		0, 1, 0,
+		0, 0, 1, 1
 	]),
 	new VertexBufferLayout([
 		{
@@ -16,22 +21,28 @@ const vertexBuffer: VertexBuffer = new VertexBuffer(
 			size: 3,
 			type: VertexTypes.FLOAT,
 			normalized: false
-		}
+		},
+		{
+			name: 'color',
+			size: 4,
+			type: VertexTypes.FLOAT,
+			normalized: false
+		},
 	])
 );
 
 const indexBuffer: IndexBuffer = new IndexBuffer(
 	new Uint32Array([
-		2, 1, 0,
-		3, 2, 0,
+		2, 1, 0
 	])
-);
+)
 
 const vertexShader: Shader = new Shader(
 	`
 	precision mediump float;
 
 	attribute vec3 position;
+	attribute vec4 color;
 
 	uniform mat4 transform;
 	uniform mat4 perspective;
@@ -41,6 +52,7 @@ const vertexShader: Shader = new Shader(
 	varying vec4 v_position;
 
 	void main(void) {
+		v_color = color;
 		v_position = perspective * view * transform * vec4(position, 1.0);
 		gl_Position = v_position;
 	}
@@ -56,7 +68,7 @@ const fragmentShader: Shader = new Shader(
 	varying vec4 v_position;
 
 	void main(void) {
-		gl_FragColor = vec4(0.85, 0.45, 0.33, 1.0);
+		gl_FragColor = v_color;
 	}
 	`,
 	ShaderType.FRAGMENT
@@ -72,7 +84,9 @@ const material: Material = new Material(shaderProgram, [
 	}
 ])
 
-const square: SceneObject = new SceneObject(vertexBuffer, indexBuffer, material);
-square.name = 'Square';
+const triangle: SceneObject = new SceneObject(vertexBuffer, indexBuffer, material);
+triangle.name = 'Triangle';
 
-export { square };
+export { triangle };
+
+

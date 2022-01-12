@@ -1,70 +1,18 @@
-import * as React from 'react';
-import { vec3, vec4, mat4, quat } from 'gl-matrix';
+import { vec4, mat4 } from 'gl-matrix';
 
 import { VertexBuffer, IndexBuffer, VertexBufferLayout, VertexLayout, VertexTypes}  from './Buffer';
 import { Shader, ShaderProgram, ShaderType } from './Shader';
+import { Texture } from './Texture';
 import { Material, MaterialProperty, MaterialPropertyType } from './Material';
 import { Scene, SceneObject, Camera } from './Scene';
 
-import { triangle } from './TestObjects/Triangle';
-import { SceneContext } from '../SceneContext';
 
-import './Renderer.scss'
-
-interface RendererProps {
-	/**TODO  Fill out if necessary*/
-}
-
-export class Renderer extends React.Component<RendererProps> {
+class Renderer {
 
 	private _gl: WebGL2RenderingContext;
-	private _canvas: React.RefObject<HTMLCanvasElement>;
-	private _container: React.RefObject<HTMLDivElement>;
 
-	constructor(props: RendererProps) {
-		super(props);
-		this._canvas = React.createRef<HTMLCanvasElement>();
-		this._container = React.createRef<HTMLDivElement>();
-	}
-
-	componentDidMount(): void {
-		this._gl = this._canvas.current.getContext('webgl2');
-		if (!this._gl) {
-			throw new Error('WebGL context not set!');
-		}
-		
-		const { width, height } = this._container.current.getBoundingClientRect();
-		this.resizeCanvas(width, height);		
-		this._canvas.current.addEventListener('resize', this.onResize.bind(this));
-
-
-		const camera: Camera = new Camera(width/height, 90, 0.001, 1000);
-		camera.translation = [0, 0, 1];
-
-		const scene: Scene = this.context;
-		scene.camera = camera;
-		scene.backgroundColor = [0.48, 0.54, 0.87, 1.0];
-
-		this.drawScene(scene);
-	}
-
-	onResize(event: Event): any {
-		const width: number = this._container.current.clientWidth;
-		const height: number = this._container.current.clientHeight;
-		this.resizeCanvas(width, height);
-	}
-
-	resizeCanvas(width: number, height: number): void {
-		this._canvas.current.width = width;
-		this._canvas.current.height = height;
-	}
-
-	render(): React.ReactNode {
-		return (
-			<div className='renderer' ref={this._container}>
-				<canvas className='canvas' ref={this._canvas}></canvas>
-			</div>
-		)
+	constructor(gl: WebGL2RenderingContext) {
+		this._gl = gl;
 	}
 
 	preprocessScene(scene: Scene): void {
@@ -89,10 +37,9 @@ export class Renderer extends React.Component<RendererProps> {
 		this.setClearColor(scene.backgroundColor);
 		this.enable(this._gl.DEPTH_TEST);
 		this.clear(this._gl.COLOR_BUFFER_BIT);
-		this.setViewport();
 	}
 
-	// ~~~~~ DRAW SCENE ~~~~~
+	// ~~~~~~~~~~ DRAW SCENE ~~~~~~~~~~
 	drawScene(scene: Scene): void {
 		this.clear(this._gl.COLOR_BUFFER_BIT);
 
@@ -122,6 +69,8 @@ export class Renderer extends React.Component<RendererProps> {
 	drawElements(mode: number, count: number, type: number): void {
 		this._gl.drawElements(mode, count, type, 0);
 	}
+
+	// ~~~~~~~~~~ BUFFER ~~~~~~~~~~
 
 	createVertexBuffer(buffer: VertexBuffer): void {
 		buffer.buffer = this._gl.createBuffer();
@@ -160,6 +109,8 @@ export class Renderer extends React.Component<RendererProps> {
 	unbindIndexBuffer(): void {
 		this._gl.bindBuffer(this._gl.ELEMENT_ARRAY_BUFFER, null);
 	}
+
+	// ~~~~~~~~~~ SHADER ~~~~~~~~~~
 
 	createShader(shader: Shader): void {
 		const shaderType: ShaderType = shader.type === ShaderType.FRAGMENT 
@@ -211,70 +162,6 @@ export class Renderer extends React.Component<RendererProps> {
 		this._gl.uniformMatrix4fv(location, false, mat4);
 	}
 
-	setMaterial(material: Material) {
-		const shaderProgram: ShaderProgram = material.program;
-		this.useProgram(shaderProgram);
-
-		material.properties.forEach((property: MaterialProperty) => {
-			const { name, value } = property;
-			switch (property.type) {
-				case MaterialPropertyType.VEC4:
-					this.setUniform4f(shaderProgram, name, value);
-					break;
-
-				case MaterialPropertyType.MAT4:
-					this.setUniform4Mat(shaderProgram, name, value);
-			}
-		})
-	}
-
-	setClearColor(color: vec4): void {
-		this._gl.clearColor(color[0], color[1], color[2], color[3]);
-	}
-
-	clear(flag: number): void {
-		this._gl.clear(flag);
-	}
-
-	enable(flag: number): void {
-		this._gl.enable(flag);
-	}
-
-	setViewport(): void {
-		this._gl.viewport(0, 0, this._canvas.current.width, this._canvas.current.height);
-	}
-
-	bindSceneObject(obj: SceneObject): void {
-		this.bindVertexBuffer(obj.vertexBuffer);
-		this.setVertexAttributes(obj.material.program, obj.vertexBuffer.layout);
-		this.bindIndexBuffer(obj.indexBuffer);
-		this.setMaterial(obj.material);
-	}
-
-	unbindSceneObject(): void {
-		this.unbindVertexBuffer();
-		this.unbindIndexBuffer();
-		this.dropProgram();
-	}
-
-	toGLType(type: VertexTypes): number {
-		switch(type) {
-			case VertexTypes.FLOAT:
-				return this._gl.FLOAT;
-			default:
-				throw new Error('Unidentified VertexType!');
-		}
-	}
-
-	getTypeSize(type: VertexTypes): number {
-		switch(type) {
-			case VertexTypes.FLOAT:
-				return 4;
-			default:
-				throw new Error('Unidentified VertexType!');
-		}
-	}
-
 	// TODO: change function so vertexAttribPointer parameters can be stored locally including stride on total layout
 	setVertexAttributes(shaderProgram: ShaderProgram, vertexLayout: VertexBufferLayout): void {
 		this.useProgram(shaderProgram);
@@ -295,5 +182,102 @@ export class Renderer extends React.Component<RendererProps> {
 		});
 		vertexLayout.created = true;
 	}
+
+	// ~~~~~~~~~~ TEXTURE ~~~~~~~~~~
+
+	createTexture(texture: Texture): void {
+		texture.texture = this._gl.createTexture()
+	}
+
+	bindTexture(texture: Texture): void {
+		this._gl.bindTexture(this._gl.TEXTURE_2D, texture);
+	}
+
+	fillTexture(texture: Texture): void {
+		const level = 0;
+		const internalFormat = 0;
+		const width = 0;
+		const height = 0;
+		const border = 0;
+		const srcFormat = 0;
+		const srcType = 0;
+		const data = new Uint8Array([0, 0, 255, 255]);
+
+		this._gl.texImage2D(this._gl.TEXTURE_2D, level, internalFormat, 
+			width, height, border, srcFormat, srcType, data);
+	}
+
+	// ~~~~~~~~~~ MATERIAL ~~~~~~~~~~
+
+	setMaterial(material: Material) {
+		const shaderProgram: ShaderProgram = material.program;
+		this.useProgram(shaderProgram);
+
+		material.properties.forEach((property: MaterialProperty) => {
+			const { name, value } = property;
+			switch (property.type) {
+				case MaterialPropertyType.VEC4:
+					this.setUniform4f(shaderProgram, name, value);
+					break;
+
+				case MaterialPropertyType.MAT4:
+					this.setUniform4Mat(shaderProgram, name, value);
+			}
+		})
+	}
+
+	// ~~~~~~~~~~ RENDERER ~~~~~~~~~~
+
+	setClearColor(color: vec4): void {
+		this._gl.clearColor(color[0], color[1], color[2], color[3]);
+	}
+
+	clear(flag: number): void {
+		this._gl.clear(flag);
+	}
+
+	enable(flag: number): void {
+		this._gl.enable(flag);
+	}
+
+	setViewport(width: number, height: number): void {
+		this._gl.viewport(0, 0, width, height);
+	}
+
+	// ~~~~~~~~~~ SCENE ~~~~~~~~~~
+
+	bindSceneObject(obj: SceneObject): void {
+		this.bindVertexBuffer(obj.vertexBuffer);
+		this.setVertexAttributes(obj.material.program, obj.vertexBuffer.layout);
+		this.bindIndexBuffer(obj.indexBuffer);
+		this.setMaterial(obj.material);
+	}
+
+	unbindSceneObject(): void {
+		this.unbindVertexBuffer();
+		this.unbindIndexBuffer();
+		this.dropProgram();
+	}
+
+	// ~~~~~~~~~~ UTILS ~~~~~~~~~~
+
+	toGLType(type: VertexTypes): number {
+		switch(type) {
+			case VertexTypes.FLOAT:
+				return this._gl.FLOAT;
+			default:
+				throw new Error('Unidentified VertexType!');
+		}
+	}
+
+	getTypeSize(type: VertexTypes): number {
+		switch(type) {
+			case VertexTypes.FLOAT:
+				return 4;
+			default:
+				throw new Error('Unidentified VertexType!');
+		}
+	}
 }
-Renderer.contextType = SceneContext;
+
+export { Renderer }

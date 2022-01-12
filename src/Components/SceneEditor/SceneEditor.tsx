@@ -1,12 +1,13 @@
 import * as React from 'react';
 
-import { SceneContext } from '../SceneContext';
+import { SceneContext } from '../Context/SceneContext';
 
-import { Scene, SceneObject } from '../Renderer/Scene';
+import { Camera } from '../../Renderer/Scene';
+import { Scene, SceneObject } from '../../Renderer/Scene';
 
-import { triangle } from '../Renderer/TestObjects/Triangle';
-import { cube } from '../Renderer/TestObjects/Cube';
-import { square } from '../Renderer/TestObjects/Square';
+import { triangle } from '../../res/TestObjects/Triangle';
+import { cube } from '../../res/TestObjects/Cube';
+import { square } from '../../res/TestObjects/Square';
 
 import { SceneObjectEditor } from './SceneObjectEditor';
 
