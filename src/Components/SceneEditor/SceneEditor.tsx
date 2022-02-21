@@ -11,6 +11,8 @@ import { square } from '../../res/TestObjects/Square';
 
 import { SceneObjectEditor } from './SceneObjectEditor';
 
+import { ObjFileReader } from '../../FileReader/ObjReader';
+
 import 'bootstrap'
 import './SceneEditor.scss';
 
@@ -23,9 +25,11 @@ interface SceneEditorProps {
 class SceneEditor extends React.Component<SceneEditorProps> {
 
 	private _scene: Scene;
+	private _objFileReader: ObjFileReader;
 
 	constructor(props: SceneEditorProps) {
 		super(props);
+		this._objFileReader = new ObjFileReader();
 	}
 
 	componentDidMount(): void {
@@ -45,7 +49,7 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 		
 		const r = [rand(0, 360), rand(0, 360), rand(0, 360)];
 		tri.updateFunction = (time: number, obj: SceneObject) => {
-			obj.rotation = [time * r[0], time * r[1], time * r[2]];
+			//obj.rotation = [time * r[0], time * r[1], time * r[2]];
 		}
 
 		this._scene.addObject(tri);
@@ -73,14 +77,43 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 		this.forceUpdate();
 	}
 
+	addFile(files: FileList) {
+		const file: File = files.item(0);
+		const fileReader: FileReader = new FileReader();
+		fileReader.readAsText(file)
+		fileReader.onload = ((event: ProgressEvent) => {
+			const fileText: string = fileReader.result as string;
+			let fileObj: SceneObject = this._objFileReader.toSceneObject(fileText)
+			fileObj.name = 'File Obj';
+			fileObj.translation = [0, 0, -10];
+			let scale = 0.5;
+			fileObj.updateFunction = (time: number, obj: SceneObject) => {
+				obj.rotation = [10 * time, 10 * time , 10 * time];
+			};
+			fileObj.scale = [scale, scale, scale];
+			this._scene.addObject(fileObj);
+		})
+	}
+
+	deleteSceneObject(id: string) {
+		this._scene.deleteObject(id);
+		this.forceUpdate();
+	}
+
 	render() {
 		return (
 			<div className='scene-editor'>
 				<button id="add-tri"className='btn btn-primary' onClick={() => this.addCube.bind(this)('New Cube')}>Add Cube</button>
-				<button id="add-cube" className='btn btn-primary'onClick={() => this.addTri.bind(this)('New Tri')}>Add Triangle</button>
+				<button id="add-cube" className='btn btn-primary' onClick={() => this.addTri.bind(this)('New Tri')}>Add Triangle</button>
+				<input type="file" id="add-modle" className='btn btn-primary' onChange={(e) => this.addFile.bind(this)(e.target.files)}></input>
 				<div className='obj-list'>
 					{this._scene && this._scene.objectList.map((obj: SceneObject) => (
-						<SceneObjectEditor key={obj.id} object={obj}></SceneObjectEditor>
+						<SceneObjectEditor 
+							key={obj.id} 
+							object={obj} 
+							onDeleteSceneObject={this.deleteSceneObject.bind(this)}
+						>
+						</SceneObjectEditor>
 					))}
 				</div>
 			</div>

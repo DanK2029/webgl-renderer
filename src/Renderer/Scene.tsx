@@ -60,6 +60,12 @@ class Scene {
 		this._objectList.push(object);
 	}
 
+	deleteObject(id: string) {
+		this._objectList = this._objectList.filter((obj: SceneObject) => (
+			obj.id !== id
+		))
+	}
+
 	tick(): void {
 		this._time += this._deltaTime;
 	}
@@ -159,6 +165,14 @@ class SceneObject {
 		this._rotation = vec;
 	}
 
+	rotate(dx: number, dy: number, dz: number) {
+		this._rotation = [
+			this._rotation[0] + dx,
+			this._rotation[1] + dy,
+			this._rotation[2] + dz
+		]
+	}
+
 	get rotation(): vec3 {
 		return this._rotation;
 	}
@@ -235,6 +249,14 @@ class Camera {
 
 	get rotation(): vec3 {
 		return this._rotation;
+	}
+
+	rotate(dx: number, dy: number, dz: number) {
+		this._rotation = [
+			this._rotation[0] + dx,
+			this._rotation[1] + dy,
+			this._rotation[2] + dz
+		]
 	}
 
 	set rotation(vec: vec3) {
