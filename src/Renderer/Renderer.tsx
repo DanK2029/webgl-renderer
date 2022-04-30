@@ -32,6 +32,14 @@ class Renderer {
 			if (!obj.vertexBuffer.layout.created) {
 				this.setVertexAttributes(obj.material.program, obj.vertexBuffer.layout);
 			}
+
+			obj.material.properties.forEach((prop: MaterialProperty) => {
+				switch (prop.type) {
+					case MaterialPropertyType.TEXTURE:
+						this.createTexture(prop.value as Texture);
+						break;
+				}
+			})
 		});
 
 		this.setClearColor(scene.backgroundColor);
@@ -152,6 +160,11 @@ class Renderer {
 		this._gl.useProgram(null);
 	}
 
+	setUniform1i(shaderProgram: ShaderProgram, name: string, int: number): void {
+		const location: WebGLUniformLocation = this._gl.getUniformLocation(shaderProgram.program, name);
+		this._gl.uniform1i(location, int);
+	}
+
 	setUniform4f(shaderProgram: ShaderProgram, name: string, vec4: vec4): void {
 		const location: WebGLUniformLocation = this._gl.getUniformLocation(shaderProgram.program, name);
 		this._gl.uniform4fv(location, vec4);
@@ -161,6 +174,8 @@ class Renderer {
 		const location: WebGLUniformLocation = this._gl.getUniformLocation(shaderProgram.program, name);
 		this._gl.uniformMatrix4fv(location, false, mat4);
 	}
+
+
 
 	// TODO: change function so vertexAttribPointer parameters can be stored locally including stride on total layout
 	setVertexAttributes(shaderProgram: ShaderProgram, vertexLayout: VertexBufferLayout): void {
@@ -187,24 +202,28 @@ class Renderer {
 
 	createTexture(texture: Texture): void {
 		texture.texture = this._gl.createTexture()
+		texture.created = true;
 	}
 
 	bindTexture(texture: Texture): void {
-		this._gl.bindTexture(this._gl.TEXTURE_2D, texture);
+		this._gl.bindTexture(this._gl.TEXTURE_2D, texture.texture);
 	}
 
 	fillTexture(texture: Texture): void {
 		const level = 0;
-		const internalFormat = 0;
-		const width = 0;
-		const height = 0;
+		const internalFormat = this._gl.RGBA;
+		const width = texture.width;
+		const height = texture.height;
 		const border = 0;
-		const srcFormat = 0;
-		const srcType = 0;
-		const data = new Uint8Array([0, 0, 255, 255]);
+		const srcFormat = this._gl.RGBA;
+		const srcType = this._gl.UNSIGNED_BYTE;
+		const data = texture.data;
 
+		this._gl.bindTexture(this._gl.TEXTURE_2D, texture.texture);
 		this._gl.texImage2D(this._gl.TEXTURE_2D, level, internalFormat, 
 			width, height, border, srcFormat, srcType, data);
+		console.log(width, height);
+		this._gl.generateMipmap(this._gl.TEXTURE_2D);
 	}
 
 	// ~~~~~~~~~~ MATERIAL ~~~~~~~~~~
@@ -217,11 +236,19 @@ class Renderer {
 			const { name, value } = property;
 			switch (property.type) {
 				case MaterialPropertyType.VEC4:
-					this.setUniform4f(shaderProgram, name, value);
+					this.setUniform4f(shaderProgram, name, value as vec4);
 					break;
 
 				case MaterialPropertyType.MAT4:
-					this.setUniform4Mat(shaderProgram, name, value);
+					this.setUniform4Mat(shaderProgram, name, value as mat4);
+					break;
+
+				case MaterialPropertyType.TEXTURE:
+					this._gl.activeTexture(this._gl.TEXTURE0);
+					this.bindTexture(value as Texture);
+					this.setUniform1i(shaderProgram, name, 0);
+					this.fillTexture(value as Texture);
+					break;
 			}
 		})
 	}

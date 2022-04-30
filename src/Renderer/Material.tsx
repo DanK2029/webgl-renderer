@@ -1,4 +1,7 @@
+import { vec2, vec3, vec4, mat4 } from 'gl-matrix'
+
 import { ShaderProgram } from './Shader'
+import { Texture } from './Texture'
 
 enum MaterialPropertyType {
 	SCALAR,
@@ -9,10 +12,12 @@ enum MaterialPropertyType {
 	TEXTURE
 }
 
+type MaterialPropertyValue = number | vec2 | vec3 | vec4 | mat4 | Texture;
+
 interface MaterialProperty {
 	type: MaterialPropertyType,
 	name: string,
-	value: any
+	value: MaterialPropertyValue
 }
 
 class Material {

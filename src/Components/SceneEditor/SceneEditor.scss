@@ -54,6 +54,20 @@
 	color: $dark-gray !important;
 }
 
+#add-square {
+	width: 100%;
+	border-color: $light-red;
+	@include button-variant(
+		$light-red, 
+		darken($light-red, 7.5%), 
+		darken($light-red,  10%), 
+		lighten($light-red,  5%), 
+		lighten($light-red, 10%), 
+		darken($light-red,  30%)
+	);
+	color: $dark-gray !important;
+}
+
 #add-modle {
 	width: 100%;
 	border-color: $light-red;

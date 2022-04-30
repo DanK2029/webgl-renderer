@@ -16,6 +16,7 @@ import { ObjFileReader } from '../../FileReader/ObjReader';
 import 'bootstrap'
 import './SceneEditor.scss';
 import { Texture } from '../../Renderer/Texture';
+import { Material, MaterialProperty, MaterialPropertyType } from '../../Renderer/Material';
 
 type EventCallback = (event: any) => void;
 
@@ -27,6 +28,9 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 
 	private _scene: Scene;
 	private _objFileReader: ObjFileReader;
+
+	// TODO: This is a test texture property remove 
+	private _testTexture: Texture;
 
 	constructor(props: SceneEditorProps) {
 		super(props);
@@ -78,6 +82,32 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 		this.forceUpdate();
 	}
 
+	addSquare(name: string = 'New Square') {
+		function rand(min: number, max: number) {
+			return Math.floor(Math.random() * (max - min + 1) + min)
+		}
+
+		let s: SceneObject = square.clone();
+		s.name = name;
+		s.translation = [0, 0, -3];
+		
+		s.translation = [rand(-1, 1), rand(-1, 1), rand(-5, -3)];
+		const r = [rand(0, 360), rand(0, 360), rand(0, 360)];
+		s.rotation = [rand(0, 360), rand(0, 360), rand(0, 360)];
+		s.updateFunction = (time: number, obj: SceneObject) => {
+			const c = 100;
+			obj.rotation = [r[0] * time, r[1] * time, r[2] * time];
+		}
+		s.material.addProperty({
+			type: MaterialPropertyType.TEXTURE,
+			name: 'texture',
+			value: this._testTexture
+		});
+
+		this._scene.addObject(s);
+		this.forceUpdate();
+	}
+
 	addObjFile(files: FileList) {
 		const file: File = files.item(0);
 		const fileReader: FileReader = new FileReader();
@@ -86,17 +116,23 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 			const fileText: string = fileReader.result as string;
 			let fileObj: SceneObject = this._objFileReader.toSceneObject(fileText)
 			fileObj.name = 'File Obj';
-			fileObj.translation = [0, 0, -10];
+			fileObj.translation = [0, 0, -15];
 			let scale = 0.5;
 			fileObj.updateFunction = (time: number, obj: SceneObject) => {
 				obj.rotation = [10 * time, 10 * time , 10 * time];
 			};
 			fileObj.scale = [scale, scale, scale];
+			fileObj.material.addProperty({
+				type: MaterialPropertyType.TEXTURE,
+				name: 'texture',
+				value: this._testTexture
+			});
+			console.log(fileObj.material.properties);
 			this._scene.addObject(fileObj);
 		})
 	}
 
-	addTextureFile(files: FileList) {
+	addTextureFile(files: FileList): any {
 		const file: File = files.item(0);
 		const fileReader: FileReader = new FileReader();
 		fileReader.readAsDataURL(file)
@@ -108,10 +144,9 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 				context.drawImage(image, image.width, image.height);
 				const imageData: ImageData = context.getImageData(image.width, image.height, image.width, image.height);
 				const texture: Texture = new Texture(imageData.data, imageData.width, imageData.height);
-				return texture;
-				console.log(texture);
+				this._testTexture = texture;
 			}
-		})
+		});
 	}
 
 	deleteSceneObject(id: string) {
@@ -124,6 +159,7 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 			<div className='scene-editor'>
 				<button id="add-tri"className='btn btn-primary' onClick={() => this.addCube.bind(this)('New Cube')}>Add Cube</button>
 				<button id="add-cube" className='btn btn-primary' onClick={() => this.addTri.bind(this)('New Tri')}>Add Triangle</button>
+				<button id="add-square" className='btn btn-primary' onClick={() => this.addSquare.bind(this)('New Square')}>Add Square</button>
 				<div className="input-group mb-3">
 					<label className="input-group-text" htmlFor="load-model">Load Model</label>
 					<input type="file" id="load-model" className='form-control' onChange={(e) => this.addObjFile.bind(this)(e.target.files)}></input>
