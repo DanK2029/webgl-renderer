@@ -8,6 +8,8 @@ import { Scene } from '../../Renderer/Scene';
 import { SceneEditor } from '../SceneEditor/SceneEditor';
 
 import { SceneContext } from '../Context/SceneContext';
+
+
 export default class App extends React.Component {
 
 	private _deltaTime: number = 0.01;

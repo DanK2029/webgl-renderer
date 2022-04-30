@@ -3,28 +3,17 @@ class Texture {
 	private _texture: WebGLTexture;
 	private _created: boolean;
 	private _loaded: boolean;
+	private _name: string;
+	private _imageData: Uint8ClampedArray;
+	private _width: number;
+	private _height: number;
 
-	constructor(url: string) {
+	constructor(imageData: Uint8ClampedArray, width: number, height: number) {
 		this._created = false;
 		this._loaded = false;
-
-		var input = document.createElement('input');
-		input.type = 'file';
-		input.onchange = e => {
-			console.log(e);
-		}
-		input.click();
-
-		let image = new Image();
-		image.src = url;
-		image.addEventListener('load', () => {
-			this._loaded = true;
-			console.log(image);
-		});
-		image.addEventListener('error', (error) => {
-			console.error(error);
-			console.error(`Could not load image at ${url}`);
-		})
+		this._imageData = imageData;
+		this._width = width;
+		this._height = height;
 	}
 
 	get texture(): WebGLTexture {

@@ -15,6 +15,7 @@ import { ObjFileReader } from '../../FileReader/ObjReader';
 
 import 'bootstrap'
 import './SceneEditor.scss';
+import { Texture } from '../../Renderer/Texture';
 
 type EventCallback = (event: any) => void;
 
@@ -77,7 +78,7 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 		this.forceUpdate();
 	}
 
-	addFile(files: FileList) {
+	addObjFile(files: FileList) {
 		const file: File = files.item(0);
 		const fileReader: FileReader = new FileReader();
 		fileReader.readAsText(file)
@@ -95,6 +96,24 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 		})
 	}
 
+	addTextureFile(files: FileList) {
+		const file: File = files.item(0);
+		const fileReader: FileReader = new FileReader();
+		fileReader.readAsDataURL(file)
+		fileReader.onload = ((event: ProgressEvent<FileReader>) => {
+			let context: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d');
+			let image = new Image();
+			image.src = fileReader.result as string;
+			image.onload = () => {
+				context.drawImage(image, image.width, image.height);
+				const imageData: ImageData = context.getImageData(image.width, image.height, image.width, image.height);
+				const texture: Texture = new Texture(imageData.data, imageData.width, imageData.height);
+				return texture;
+				console.log(texture);
+			}
+		})
+	}
+
 	deleteSceneObject(id: string) {
 		this._scene.deleteObject(id);
 		this.forceUpdate();
@@ -105,7 +124,15 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 			<div className='scene-editor'>
 				<button id="add-tri"className='btn btn-primary' onClick={() => this.addCube.bind(this)('New Cube')}>Add Cube</button>
 				<button id="add-cube" className='btn btn-primary' onClick={() => this.addTri.bind(this)('New Tri')}>Add Triangle</button>
-				<input type="file" id="add-modle" className='btn btn-primary' onChange={(e) => this.addFile.bind(this)(e.target.files)}></input>
+				<div className="input-group mb-3">
+					<label className="input-group-text" htmlFor="load-model">Load Model</label>
+					<input type="file" id="load-model" className='form-control' onChange={(e) => this.addObjFile.bind(this)(e.target.files)}></input>
+				</div>
+				<div className="input-group mb-3">
+					<label className="input-group-text" htmlFor="load-model">Load Texture</label>
+					<input type="file" id="load-model" className='form-control' onChange={(e) => this.addTextureFile.bind(this)(e.target.files)}></input>
+				</div>
+
 				<div className='obj-list'>
 					{this._scene && this._scene.objectList.map((obj: SceneObject) => (
 						<SceneObjectEditor 
