@@ -36,6 +36,10 @@ class Texture {
 		return this._loaded;
 	}
 
+	set loaded(loaded: boolean) {
+		this._loaded = loaded;
+	}
+
 	get name(): string {
 		return this._name;
 	}

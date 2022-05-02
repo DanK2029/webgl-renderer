@@ -29,9 +29,6 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 	private _scene: Scene;
 	private _objFileReader: ObjFileReader;
 
-	// TODO: This is a test texture property remove 
-	private _testTexture: Texture;
-
 	constructor(props: SceneEditorProps) {
 		super(props);
 		this._objFileReader = new ObjFileReader();
@@ -98,11 +95,6 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 			const c = 100;
 			obj.rotation = [r[0] * time, r[1] * time, r[2] * time];
 		}
-		s.material.addProperty({
-			type: MaterialPropertyType.TEXTURE,
-			name: 'texture',
-			value: this._testTexture
-		});
 
 		this._scene.addObject(s);
 		this.forceUpdate();
@@ -122,31 +114,9 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 				obj.rotation = [10 * time, 10 * time , 10 * time];
 			};
 			fileObj.scale = [scale, scale, scale];
-			fileObj.material.addProperty({
-				type: MaterialPropertyType.TEXTURE,
-				name: 'texture',
-				value: this._testTexture
-			});
 			console.log(fileObj.material.properties);
 			this._scene.addObject(fileObj);
 		})
-	}
-
-	addTextureFile(files: FileList): any {
-		const file: File = files.item(0);
-		const fileReader: FileReader = new FileReader();
-		fileReader.readAsDataURL(file)
-		fileReader.onload = ((event: ProgressEvent<FileReader>) => {
-			let context: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d');
-			let image = new Image();
-			image.src = fileReader.result as string;
-			image.onload = () => {
-				context.drawImage(image, image.width, image.height);
-				const imageData: ImageData = context.getImageData(image.width, image.height, image.width, image.height);
-				const texture: Texture = new Texture(imageData.data, imageData.width, imageData.height);
-				this._testTexture = texture;
-			}
-		});
 	}
 
 	deleteSceneObject(id: string) {
@@ -163,10 +133,6 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 				<div className="input-group mb-3">
 					<label className="input-group-text" htmlFor="load-model">Load Model</label>
 					<input type="file" id="load-model" className='form-control' onChange={(e) => this.addObjFile.bind(this)(e.target.files)}></input>
-				</div>
-				<div className="input-group mb-3">
-					<label className="input-group-text" htmlFor="load-model">Load Texture</label>
-					<input type="file" id="load-model" className='form-control' onChange={(e) => this.addTextureFile.bind(this)(e.target.files)}></input>
 				</div>
 
 				<div className='obj-list'>

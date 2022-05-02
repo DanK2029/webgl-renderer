@@ -71,6 +71,7 @@ export class ViewEditor extends React.Component<RendererProps> {
 		scene.camera = camera;
 		scene.backgroundColor = [0.48, 0.54, 0.87, 1.0];
 
+		this._renderer.setup(scene);
 		this._renderer.drawScene(scene);
 	}
 

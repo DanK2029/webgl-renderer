@@ -9,7 +9,8 @@ import { cube } from '../res/TestObjects/Cube';
 const enum OBJ_FILE_KEYWORDS {
 	COMMENT = '#',
 	VERTEX = 'v',
-	VERTEX_NORMAL = 'vt',
+	TEXTURE_COORD = 'vt',
+	VERTEX_NORMAL = 'vn',
 	VERTEX_PARAMETER = 'vp',
 	FACE = 'f',
 	LINE = 'l',
@@ -44,6 +45,7 @@ class ObjFileReader {
 	private _material: Material;
 
 	private _vertices: number[];
+	private _textureCoords: number[];
 	private _layout: VertexBufferLayout;
 	private _indices: number[];
 
@@ -61,12 +63,20 @@ class ObjFileReader {
 			line && this.parseLine(line.trim());
 		});
 
-		const vertexLayout: VertexBufferLayout = new VertexBufferLayout([{
-			name: 'position',
-			size: 3,
-			type: VertexTypes.FLOAT,
-			normalized: false
-		}]);
+		const vertexLayout: VertexBufferLayout = new VertexBufferLayout([
+			{
+				name: 'position',
+				size: 3,
+				type: VertexTypes.FLOAT,
+				normalized: false
+			},
+			// {
+			// 	name: 'texCoord',
+			// 	size: 2,
+			// 	type: VertexTypes.FLOAT,
+			// 	normalized: false
+			// }
+		]);
 
 		let sceneObject: SceneObject = cube.clone();
 		sceneObject.vertexBuffer = new VertexBuffer(new Float32Array(this._vertices), vertexLayout);
@@ -87,6 +97,10 @@ class ObjFileReader {
 			case OBJ_FILE_KEYWORDS.VERTEX:
 				// console.log('Parsing vertex...');
 				this.addVertex(tokens[1], tokens[2], tokens[3])
+				break;
+
+			case OBJ_FILE_KEYWORDS.TEXTURE_COORD:
+				this.addTextureCoord(tokens[1], tokens[2]);
 				break;
 			
 			case OBJ_FILE_KEYWORDS.VERTEX_NORMAL:
@@ -130,6 +144,10 @@ class ObjFileReader {
 
 	private addVertex(x: string, y: string, z: string) {
 		this._vertices.push(Number.parseFloat(x), Number.parseFloat(y), Number.parseFloat(z));
+	}
+
+	private addTextureCoord(u: string, v: string) {
+
 	}
 
 	private addFace(indices: string[]): void {

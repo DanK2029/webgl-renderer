@@ -15,6 +15,10 @@ class Renderer {
 		this._gl = gl;
 	}
 
+	setup(scene: Scene): void {
+
+	}
+
 	preprocessScene(scene: Scene): void {
 		scene.objectList.forEach((obj: SceneObject) => {
 			if (!obj.vertexBuffer.created) {
@@ -36,7 +40,15 @@ class Renderer {
 			obj.material.properties.forEach((prop: MaterialProperty) => {
 				switch (prop.type) {
 					case MaterialPropertyType.TEXTURE:
-						this.createTexture(prop.value as Texture);
+						const texture: Texture = prop.value as Texture;
+						if (!texture.created) {
+							this.createTexture(texture);
+						}
+
+						if (!texture.loaded) {
+							this.loadTexture(texture);
+						}
+
 						break;
 				}
 			})
@@ -209,7 +221,7 @@ class Renderer {
 		this._gl.bindTexture(this._gl.TEXTURE_2D, texture.texture);
 	}
 
-	fillTexture(texture: Texture): void {
+	loadTexture(texture: Texture): void {
 		const level = 0;
 		const internalFormat = this._gl.RGBA;
 		const width = texture.width;
@@ -222,8 +234,8 @@ class Renderer {
 		this._gl.bindTexture(this._gl.TEXTURE_2D, texture.texture);
 		this._gl.texImage2D(this._gl.TEXTURE_2D, level, internalFormat, 
 			width, height, border, srcFormat, srcType, data);
-		console.log(width, height);
 		this._gl.generateMipmap(this._gl.TEXTURE_2D);
+		texture.loaded = true;
 	}
 
 	// ~~~~~~~~~~ MATERIAL ~~~~~~~~~~
@@ -247,7 +259,6 @@ class Renderer {
 					this._gl.activeTexture(this._gl.TEXTURE0);
 					this.bindTexture(value as Texture);
 					this.setUniform1i(shaderProgram, name, 0);
-					this.fillTexture(value as Texture);
 					break;
 			}
 		})
