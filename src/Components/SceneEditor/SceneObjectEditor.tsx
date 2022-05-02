@@ -27,13 +27,16 @@ class SceneObjectEditor extends React.Component<SceneObjectEditorProps, SceneObj
 		const fileReader: FileReader = new FileReader();
 		fileReader.readAsDataURL(file)
 		fileReader.onload = ((event: ProgressEvent<FileReader>) => {
-			let context: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d');
+			let canvas: HTMLCanvasElement = document.createElement('canvas');
+			let context: CanvasRenderingContext2D = canvas.getContext('2d');
 			let image = new Image();
 			image.src = fileReader.result as string;
 			image.onload = () => {
-				context.drawImage(image, 0, 0, image.width, image.height, 0, 0, image.width, image.height);
-				const imageData: ImageData = context.getImageData(0, 0, image.width, image.height);
-				const texture: Texture = new Texture(imageData.data, imageData.width, imageData.height);
+				canvas.width = image.width;
+				canvas.height = image.height;
+				context.drawImage(image, 0, 0);
+				const imageData: ImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+				const texture: Texture = new Texture(imageData.data, canvas.width, canvas.height);
 				// TODO: Data in imageData is not correct somethimes. Investigate why.
 				console.log(imageData.data);
 				this.state.object.material.addProperty({

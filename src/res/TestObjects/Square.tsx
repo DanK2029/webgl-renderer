@@ -6,16 +6,16 @@ import { SceneObject } from '../../Renderer/Scene';
 const vertexBuffer: VertexBuffer = new VertexBuffer(
 	new Float32Array([
 		-1, 1, 0,
-		0, 1,
+		0, 0,
 
 		1, 1, 0,
-		1, 1,
-
-		1, -1, 0,
 		1, 0,
 
+		1, -1, 0,
+		1, 1,
+
 		-1, -1, 0,
-		0, 0
+		0, 1
 	]),
 	new VertexBufferLayout([
 		{

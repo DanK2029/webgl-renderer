@@ -80,21 +80,9 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 	}
 
 	addSquare(name: string = 'New Square') {
-		function rand(min: number, max: number) {
-			return Math.floor(Math.random() * (max - min + 1) + min)
-		}
-
 		let s: SceneObject = square.clone();
 		s.name = name;
-		s.translation = [0, 0, -3];
-		
-		s.translation = [rand(-1, 1), rand(-1, 1), rand(-5, -3)];
-		const r = [rand(0, 360), rand(0, 360), rand(0, 360)];
-		s.rotation = [rand(0, 360), rand(0, 360), rand(0, 360)];
-		s.updateFunction = (time: number, obj: SceneObject) => {
-			const c = 100;
-			obj.rotation = [r[0] * time, r[1] * time, r[2] * time];
-		}
+		s.translation = [0, 0, -1.2];
 
 		this._scene.addObject(s);
 		this.forceUpdate();
