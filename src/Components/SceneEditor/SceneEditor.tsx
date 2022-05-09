@@ -38,7 +38,7 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 		this._scene = this.context;
 	}
 
-	addTri(name: string = 'New Tri') {
+	addSceneObject(name: string = 'New Tri') {
 		function rand(min: number, max: number) {
 			return Math.floor(Math.random() * (max - min + 1) + min)
 		}
@@ -58,55 +58,6 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 		this.forceUpdate();
 	}
 
-	addCube(name: string = 'New Cube') {
-		function rand(min: number, max: number) {
-			return Math.floor(Math.random() * (max - min + 1) + min)
-		}
-
-		let c: SceneObject = cube.clone();
-		c.name = name;
-		c.translation = [0, 0, -3];
-		
-		c.translation = [rand(-1, 1), rand(-1, 1), rand(-5, -3)];
-		const r = [rand(0, 360), rand(0, 360), rand(0, 360)];
-		c.rotation = [rand(0, 360), rand(0, 360), rand(0, 360)];
-		c.updateFunction = (time: number, obj: SceneObject) => {
-			const c = 100;
-			obj.rotation = [r[0] * time, r[1] * time, r[2] * time];
-		}
-
-		this._scene.addObject(c);
-		this.forceUpdate();
-	}
-
-	addSquare(name: string = 'New Square') {
-		let s: SceneObject = square.clone();
-		s.name = name;
-		s.translation = [0, 0, -1.2];
-
-		this._scene.addObject(s);
-		this.forceUpdate();
-	}
-
-	addObjFile(files: FileList) {
-		const file: File = files.item(0);
-		const fileReader: FileReader = new FileReader();
-		fileReader.readAsText(file)
-		fileReader.onload = ((event: ProgressEvent) => {
-			const fileText: string = fileReader.result as string;
-			let fileObj: SceneObject = this._objFileReader.toSceneObject(fileText)
-			fileObj.name = 'File Obj';
-			fileObj.translation = [0, 0, -15];
-			let scale = 0.5;
-			fileObj.updateFunction = (time: number, obj: SceneObject) => {
-				obj.rotation = [10 * time, 10 * time , 10 * time];
-			};
-			fileObj.scale = [scale, scale, scale];
-			console.log(fileObj.material.properties);
-			this._scene.addObject(fileObj);
-		})
-	}
-
 	deleteSceneObject(id: string) {
 		this._scene.deleteObject(id);
 		this.forceUpdate();
@@ -115,20 +66,19 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 	render() {
 		return (
 			<div className='scene-editor'>
-				<button id="add-tri"className='btn btn-primary' onClick={() => this.addCube.bind(this)('New Cube')}>Add Cube</button>
-				<button id="add-cube" className='btn btn-primary' onClick={() => this.addTri.bind(this)('New Tri')}>Add Triangle</button>
-				<button id="add-square" className='btn btn-primary' onClick={() => this.addSquare.bind(this)('New Square')}>Add Square</button>
-				<div className="input-group mb-3">
-					<label className="input-group-text" htmlFor="load-model">Load Model</label>
-					<input type="file" id="load-model" className='form-control' onChange={(e) => this.addObjFile.bind(this)(e.target.files)}></input>
-				</div>
+				<button 
+					id="add-scene-object" 
+					className='btn btn-primary' 
+					onClick={() => this.addSceneObject.bind(this)('New Scene Object')}>
+					Add Object
+				</button>
 
-				<div className='obj-list'>
+				<div className="scene-object-list">
 					{this._scene && this._scene.objectList.map((obj: SceneObject) => (
 						<SceneObjectEditor 
-							key={obj.id} 
-							object={obj} 
-							onDeleteSceneObject={this.deleteSceneObject.bind(this)}
+						key={obj.id} 
+						object={obj} 
+						onDeleteSceneObject={this.deleteSceneObject.bind(this)}
 						>
 						</SceneObjectEditor>
 					))}

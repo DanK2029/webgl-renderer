@@ -1,13 +1,55 @@
-.card {
-	$card-spacing: 3px;
-	margin-top: $card-spacing;
-	margin-bottom: $card-spacing;
+@import 'bootstrap';
+@import '../Styles/Colors.scss';
+
+.scene-object {
+	@extend .container-fluid;
+	@extend .card;
+
+	margin-bottom: 5px;
+	padding: 5px;
+
+	background-color: $white;
 }
 
-.card-body {
-	padding: 5px 10px 5px 10px !important;
+.vertically-align {
+	display: flex;
+	align-items: center;
 }
 
-.delete-scene-object {
+.scene-object-icon {
+	height: 100%;
+	$height: height;
+	width: 36px;
+}
+
+.scene-object-name {
+	margin-left: 5px;
+}
+
+.delete-button {
+	@extend .btn;
+
+	$button-color: $red;
+	border-color: $button-color;
+	@include button-variant(
+		$button-color, 
+		darken($button-color, 7.5%), 
+		darken($button-color,  10%), 
+		lighten($button-color,  5%), 
+		lighten($button-color, 10%), 
+		darken($button-color,  30%)
+	);
+	color: $dark-gray !important;
+
+	padding: 5px;
+	width: 36px;
+
 	float: right;
+	:hover {
+		cursor: pointer;
+	}
+
+	.delete-icon {
+		color: white;
+	}
 }

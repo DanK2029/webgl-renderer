@@ -1,11 +1,16 @@
 import * as React from 'react';
 
+import { MdOutlineClear } from 'react-icons/md';
+import { IoMdCube } from 'react-icons/io';
+
 import { SceneObject } from '../../Renderer/Scene';
 import { Texture } from '../../Renderer/Texture';
+import { MaterialPropertyType } from '../../Renderer/Material';
+
+import { VectorEditor } from './VectorEditor';
 
 import 'bootstrap'
 import './SceneObjectEditor.scss'
-import { MaterialPropertyType } from '../../Renderer/Material';
 
 interface SceneObjectEditorProps {
 	object: SceneObject;
@@ -27,7 +32,7 @@ class SceneObjectEditor extends React.Component<SceneObjectEditorProps, SceneObj
 		const fileReader: FileReader = new FileReader();
 		
 		fileReader.readAsDataURL(file)
-		fileReader.onload = ((event: ProgressEvent<FileReader>) => {
+		fileReader.onload = (() => {
 			let canvas: HTMLCanvasElement = document.createElement('canvas');
 			let context: CanvasRenderingContext2D = canvas.getContext('2d');
 			
@@ -54,16 +59,36 @@ class SceneObjectEditor extends React.Component<SceneObjectEditorProps, SceneObj
 	render() {
 		let obj: SceneObject = this.state.object;
 		return (
-		<div className='card'>
-			<div className='card-body'>
-				<div className='card-text'>
-					{obj.name}
-					<button type='button' className='btn btn-danger delete-scene-object' 
-					onClick={() => {this.state.onDeleteSceneObject(this.state.object.id)}}>X</button>
-					<div className="input-group mb-3">
-						<label className="input-group-text" htmlFor="load-model">Load Texture</label>
-						<input type="file" id="load-model" className='form-control' onChange={(e) => this.addTextureFile.bind(this)(e.target.files)}></input>
-					</div>
+		<div className='scene-object'>
+			<div className='row'>
+				<div className='col-10 vertically-align'>
+					<IoMdCube className='scene-object-icon'></IoMdCube>
+					<div className="scene-object-name">{obj.name}</div>
+				</div>
+				<div className='col-2 vertically-align'>
+					<button 
+						className='delete-button'
+						onClick={() => this.state.onDeleteSceneObject(obj.id)}>
+						<MdOutlineClear style={{ color: 'white' }}></MdOutlineClear>
+					</button>
+				</div>
+			</div>
+
+			<div className='row'>
+				<div className='col'>
+					<VectorEditor name='Position' vector={obj.translation as number[]}></VectorEditor>
+				</div>
+			</div>
+
+			<div className='row'>
+				<div className='col'>
+					<VectorEditor name='Scale' vector={obj.scale as number[]}></VectorEditor>
+				</div>
+			</div>
+
+			<div className='row'>
+				<div className='col'>
+					<VectorEditor name='Rotation' vector={obj.rotation as number[]}></VectorEditor>
 				</div>
 			</div>
 		</div>

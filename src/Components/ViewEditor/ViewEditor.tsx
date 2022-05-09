@@ -149,8 +149,7 @@ export class ViewEditor extends React.Component<RendererProps> {
 	}
 
 	onKeyDown(event: KeyboardEvent) {
-		console.log(event);
-		console.log('Key event')
+
 	}
 	
 

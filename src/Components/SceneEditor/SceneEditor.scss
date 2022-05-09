@@ -4,14 +4,21 @@
 .scene-editor {
 	height: 100%;
 	max-height: 100%;
+
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
 }
 
-.obj-list {
-	overflow-y: scroll;
-	height: auto;
-	max-height: 70%;
+.scene-object-list {
+	flex-grow: 1;
 	padding: 2px;
+	margin-top: 5px;
+
+	overflow-y: auto;
+
 	
+	// border
 	border-radius: 5px;
 	border-color: $light-gray;
 	border-width: 2px;
@@ -21,63 +28,17 @@
 	display: none;
 }
 
-.btn {
-	margin: 5px 5px 5px 5px;
-	min-width: 0;
-}
-
-#add-tri {
+#add-scene-object {
 	width: 100%;
-	border-color: $blue;
+	$button-color: $bright-green;
+	border-color: $button-color;
 	@include button-variant(
-		$blue, 
-		darken($blue, 7.5%), 
-		darken($blue,  10%), 
-		lighten($blue,  5%), 
-		lighten($blue, 10%), 
-		darken($blue,  30%)
-	);
-	color: $dark-gray !important;
-}
-
-#add-cube {
-	width: 100%;
-	border-color: $bright-green;
-	@include button-variant(
-		$bright-green, 
-		darken($bright-green, 7.5%), 
-		darken($bright-green,  10%), 
-		lighten($bright-green,  5%), 
-		lighten($bright-green, 10%), 
-		darken($bright-green,  30%)
-	);
-	color: $dark-gray !important;
-}
-
-#add-square {
-	width: 100%;
-	border-color: $light-red;
-	@include button-variant(
-		$light-red, 
-		darken($light-red, 7.5%), 
-		darken($light-red,  10%), 
-		lighten($light-red,  5%), 
-		lighten($light-red, 10%), 
-		darken($light-red,  30%)
-	);
-	color: $dark-gray !important;
-}
-
-#add-modle {
-	width: 100%;
-	border-color: $light-red;
-	@include button-variant(
-		$light-red, 
-		darken($light-red, 7.5%), 
-		darken($light-red,  10%), 
-		lighten($light-red,  5%), 
-		lighten($light-red, 10%), 
-		darken($light-red,  30%)
+		$button-color, 
+		darken($button-color, 7.5%), 
+		darken($button-color,  10%), 
+		lighten($button-color,  5%), 
+		lighten($button-color, 10%), 
+		darken($button-color,  30%)
 	);
 	color: $dark-gray !important;
 }
