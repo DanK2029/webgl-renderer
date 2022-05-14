@@ -24,12 +24,6 @@ const vertexBuffer: VertexBuffer = new VertexBuffer(
 			type: VertexTypes.FLOAT,
 			normalized: false
 		},
-		{
-			name: 'texCoord',
-			size: 2,
-			type: VertexTypes.FLOAT,
-			normalized: false
-		}
 	])
 );
 

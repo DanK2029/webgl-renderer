@@ -2,9 +2,6 @@
 @import '../Styles/Colors.scss';
 
 .scene-object {
-	@extend .container-fluid;
-	@extend .card;
-
 	margin-bottom: 5px;
 	padding: 5px;
 

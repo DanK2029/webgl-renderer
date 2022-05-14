@@ -1,6 +1,6 @@
 import { vec2, vec3 } from 'gl-matrix';
 
-import { IndexBuffer, VertexBuffer, VertexBufferLayout, VertexTypes } from '../Renderer/Buffer';
+import { IndexBuffer, VertexBuffer, VertexBufferLayout, VertexTypes, VertexLayout } from '../Renderer/Buffer';
 import { SceneObject } from '../Renderer/Scene';
 import { Material } from '../Renderer/Material';
 
@@ -28,7 +28,7 @@ interface FaceVertex {
 	textureCoordData: vec2;
 	normalIndex: number;
 	normalData: vec3;
-	newCreated?: boolean;
+	index: number;
 }
 
 interface FaceTriangle {
@@ -37,24 +37,70 @@ interface FaceTriangle {
 	v2: FaceVertex;
 }
 
+interface VertexList extends VertexLayout {
+	list: number[][];
+}
+
+interface ObjVertexLists {
+	[key: string]: VertexList;
+	position: VertexList;
+	texCoord: VertexList;
+	normal: VertexList;
+}
+
 class ObjFileReader {
 
-	private _sceneObject: SceneObject;
-	private _vertexBuffer: VertexBuffer;
-	private _indexBuffer: IndexBuffer;
-	private _material: Material;
-
-	private _vertices: number[];
-	private _textureCoords: number[];
 	private _layout: VertexBufferLayout;
 	private _indices: number[];
 
+	private _vertexLists: ObjVertexLists;
+	private _globalVertexMap: Record<string, FaceVertex>;
+	private _vertexCounter: number;
+
 	constructor() {
+		this._globalVertexMap = {};
+		this._vertexCounter = 0;
+
+		this._vertexLists = {
+			position: {
+				name: 'position',
+				size: 3,
+				type: VertexTypes.FLOAT,
+				normalized: false,
+				list: [],
+			},
+			texCoord: {
+				name: 'texCoord',
+				size: 2,
+				type: VertexTypes.FLOAT,
+				normalized: false,
+				list: [],
+			},
+			normal: {
+				name: 'normal',
+				size: 3,
+				type: VertexTypes.FLOAT,
+				normalized: false,
+				list: [],
+			},
+		};
+
+		this._layout = new VertexBufferLayout(
+			Object.keys(this._vertexLists).map((vertexAttribute: string) => {
+				const layout: VertexLayout = this._vertexLists[vertexAttribute];
+				return {
+					name: layout.name,
+					size: layout.size,
+					type: layout.type,
+					normalized: layout.normalized
+				};
+			}
+		));
+
 		this.reset()
 	}
 
 	public reset() {
-		this._vertices = [];
 		this._indices = [];
 	}
 
@@ -62,26 +108,33 @@ class ObjFileReader {
 		data.split('\n').forEach((line: string) => {
 			line && this.parseLine(line.trim());
 		});
-
-		const vertexLayout: VertexBufferLayout = new VertexBufferLayout([
-			{
-				name: 'position',
-				size: 3,
-				type: VertexTypes.FLOAT,
-				normalized: false
-			},
-			// {
-			// 	name: 'texCoord',
-			// 	size: 2,
-			// 	type: VertexTypes.FLOAT,
-			// 	normalized: false
-			// }
-		]);
-
+		
 		let sceneObject: SceneObject = cube.clone();
-		sceneObject.vertexBuffer = new VertexBuffer(new Float32Array(this._vertices), vertexLayout);
+		sceneObject.vertexBuffer = this.createVertexBuffer();
 		sceneObject.indexBuffer = new IndexBuffer(new Uint32Array(this._indices));
+
 		return sceneObject;
+	}
+
+	private createVertexBuffer(): VertexBuffer {
+		console.log(this._indices);
+		const vertices: number[] = Object.values(this._globalVertexMap)
+			.sort((v1: FaceVertex, v2: FaceVertex) => v1.index < v2.index ? -1 : 1)
+			.flatMap((v: FaceVertex) => {
+				let vertexData: number[] = [];
+
+				const positionData = v.vertexData as number[];
+				const textureCoordData = v.textureCoordData as number[];
+				const normalData = v.normalData as number[];
+
+				positionData ? vertexData.push(...positionData) : [0, 0, 0];
+				textureCoordData ? vertexData.push(...textureCoordData) : [0, 0];
+				normalData ? vertexData.push(...normalData) : [0, 0, 0];
+
+				return vertexData;
+			});
+
+		return new VertexBuffer(new Float32Array(vertices), this._layout);
 	}
 
 	public parseLine(line: string) {
@@ -105,6 +158,7 @@ class ObjFileReader {
 			
 			case OBJ_FILE_KEYWORDS.VERTEX_NORMAL:
 				// console.log('Parsing normal...');
+				this.addNormal(tokens[1], tokens[2], tokens[3])
 				break;
 			
 			case OBJ_FILE_KEYWORDS.VERTEX_PARAMETER:
@@ -143,11 +197,15 @@ class ObjFileReader {
 	}
 
 	private addVertex(x: string, y: string, z: string) {
-		this._vertices.push(Number.parseFloat(x), Number.parseFloat(y), Number.parseFloat(z));
+		this._vertexLists.position.list.push([Number.parseFloat(x), Number.parseFloat(y), Number.parseFloat(z)]);
 	}
 
 	private addTextureCoord(u: string, v: string) {
+		this._vertexLists.texCoord.list.push([Number.parseFloat(u), 1 - Number.parseFloat(v)]);
+	}
 
+	private addNormal(x: string, y: string, z: string) {
+		this._vertexLists.normal.list.push([Number.parseFloat(x), Number.parseFloat(y), Number.parseFloat(z)]);
 	}
 
 	private addFace(indices: string[]): void {
@@ -170,10 +228,18 @@ class ObjFileReader {
 		}
 
 		triangles.forEach((tri: FaceTriangle) => {
-			const v0: number = tri.v0.vertexIndex;
-			const v1: number = tri.v1.vertexIndex;
-			const v2: number = tri.v2.vertexIndex;
-			this._indices.push(v0, v1, v2);
+			let faceIndices: number[] = new Array<number>();
+			[tri.v0, tri.v1, tri.v2].forEach((vertex: FaceVertex) => {
+				const vertexId: string = `${vertex.vertexIndex}/${vertex.textureCoordIndex}/${vertex.normalIndex}`;
+				if (!this._globalVertexMap[vertexId]) {
+					vertex.index = this._vertexCounter++;
+					this._globalVertexMap[vertexId] = vertex;
+					faceIndices.push(vertex.index);
+				} else {
+					faceIndices.push(this._globalVertexMap[vertexId].index);
+				}
+			});
+			this._indices.push(...faceIndices);
 		});
 	}
 
@@ -201,19 +267,33 @@ class ObjFileReader {
 		if (values.length < 3) {
 			throw new Error('Face token not enough values to parse correctly!');
 		}
-		
-		const vertex: number = Number.parseFloat(values[0]);
-		const texture: number = Number.parseFloat(values[1]);
-		const normal: number = Number.parseFloat(values[2]);
 
-		return {
-			vertexIndex: vertex,
-			vertexData: undefined,
-			textureCoordIndex: texture,
-			textureCoordData: undefined,
-			normalIndex: normal,
-			normalData: undefined
+		const vertexIndex: number = values[0] ? Number.parseFloat(values[0]) - 1 : undefined;
+		const vertexData: vec3 = vertexIndex !== undefined 
+			? this._vertexLists.position.list[vertexIndex] as vec3 
+			: undefined;
+
+		const textureIndex: number = values[1] ? Number.parseFloat(values[1]) - 1 : undefined;
+		const textureData: vec2 = textureIndex !== undefined 
+			? this._vertexLists.texCoord.list[textureIndex] as vec2 
+			: undefined;
+
+		const normalIndex: number = values[2] ? Number.parseFloat(values[2]) - 1 : undefined;
+		const normalData: vec3 = normalIndex !== undefined 
+			? this._vertexLists.normal.list[vertexIndex] as vec3 
+			: undefined;
+
+		const vertex: FaceVertex = {
+			vertexIndex: vertexIndex,
+			vertexData: vertexData,
+			textureCoordIndex: textureIndex,
+			textureCoordData: textureData,
+			normalIndex: normalIndex,
+			normalData: normalData,
+			index: undefined,
 		};
+
+		return vertex;
 	}
 
 }

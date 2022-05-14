@@ -68,6 +68,7 @@ export class ViewEditor extends React.Component<RendererProps> {
 
 		const scene: Scene = this.context;
 		let camera: Camera = new Camera(width/height, 90, 0.001, 1000);
+		camera.translation = [0, 0, 5];
 		scene.camera = camera;
 		scene.backgroundColor = [0.48, 0.54, 0.87, 1.0];
 

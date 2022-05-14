@@ -50,6 +50,7 @@ const vertexShader: Shader = new Shader(
 
 	varying vec4 v_color;
 	varying vec4 v_position;
+	varying vec2 v_texCoord;
 
 	void main(void) {
 		v_color = color;
@@ -66,9 +67,12 @@ const fragmentShader: Shader = new Shader(
 
 	varying vec4 v_color;
 	varying vec4 v_position;
+	varying vec2 v_texCoord;
+
+	uniform sampler2D texture;
 
 	void main(void) {
-		gl_FragColor = v_color;
+		gl_FragColor = texture2D(texture, v_texCoord);
 	}
 	`,
 	ShaderType.FRAGMENT

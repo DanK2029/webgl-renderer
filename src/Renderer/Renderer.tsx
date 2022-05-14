@@ -202,8 +202,10 @@ class Renderer {
 			const glType: number = this.toGLType(type);
 			const location: number = this._gl.getAttribLocation(shaderProgram.program, name);
 
-			this._gl.vertexAttribPointer(location, size, glType, normalized, stride, offset);
-			this._gl.enableVertexAttribArray(location);
+			if (location >= 0) {
+				this._gl.vertexAttribPointer(location, size, glType, normalized, stride, offset);
+				this._gl.enableVertexAttribArray(location);
+			}
 
 			offset += this.getTypeSize(type) * size;
 		});

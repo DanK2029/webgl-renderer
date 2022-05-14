@@ -4,31 +4,7 @@ import { Material, MaterialPropertyType } from '../../Renderer/Material';
 import { SceneObject } from '../../Renderer/Scene';
 
 const vertexBuffer: VertexBuffer = new VertexBuffer(
-	new Float32Array([
-		 1,  1,  1,
-		 0.86, 0.45, 0.25, 1,
-
-		 1,  1, -1,
-		 0.86, 0.86, 0.25, 1,
-
-		 1, -1,  1,
-		 0.25, 0.86, 0.25, 1,
-		 
-		 1, -1, -1,
-		 0.45, 0.86, 0.86, 1,
-
-		-1,  1,  1,
-		0.25, 0.25, 0.86, 1,
-
-		-1,  1, -1,
-		0.86, 0.45, 0.86, 1,
-
-		-1, -1,  1,
-		0.45, 0.25, 0.45, 1,
-
-		-1, -1, -1,
-		0.86, 0.86, 0.86, 1,
-	]),
+	new Float32Array([]),
 	new VertexBufferLayout([
 		{
 			name: 'position',
@@ -37,34 +13,22 @@ const vertexBuffer: VertexBuffer = new VertexBuffer(
 			normalized: false
 		},
 		{
-			name: 'color',
-			size: 4,
+			name: 'texCoord',
+			size: 2,
 			type: VertexTypes.FLOAT,
 			normalized: false
 		},
+		{
+			name: 'normal',
+			size: 3,
+			type: VertexTypes.FLOAT,
+			normalized: false
+		}
 	])
 );
 
 const indexBuffer: IndexBuffer = new IndexBuffer(
-	new Uint32Array([
-		1, 0, 2,
-		1, 2, 3,
-
-		0, 4, 6,
-		0, 6, 2,
-
-		4, 5, 7,
-		4, 7, 6,
-
-		5, 1, 3,
-		5, 3, 7,
-
-		1, 5, 4,
-		1, 4, 0,
-
-		2, 6, 7,
-		2, 7, 3,
-	])
+	new Uint32Array([])
 );
 
 const vertexShader: Shader = new Shader(
@@ -121,9 +85,9 @@ const material: Material = new Material(shaderProgram, [
 	}
 ])
 
-const cube: SceneObject = new SceneObject(vertexBuffer, indexBuffer, material);
-cube.name = 'Cube';
+const empty: SceneObject = new SceneObject(vertexBuffer, indexBuffer, material);
+empty.name = 'Empty Scene Object';
 
-export { cube };
+export { empty };
 
 

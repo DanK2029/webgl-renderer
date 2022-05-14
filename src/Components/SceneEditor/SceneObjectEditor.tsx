@@ -7,6 +7,8 @@ import { SceneObject } from '../../Renderer/Scene';
 import { Texture } from '../../Renderer/Texture';
 import { MaterialPropertyType } from '../../Renderer/Material';
 
+import { ObjFileReader } from '../../FileReader/ObjReader';
+
 import { VectorEditor } from './VectorEditor';
 
 import 'bootstrap'
@@ -25,6 +27,21 @@ class SceneObjectEditor extends React.Component<SceneObjectEditorProps, SceneObj
 			object: props.object,
 			onDeleteSceneObject: props.onDeleteSceneObject
 		}
+	}
+
+	addModelFile(files: FileList): any {
+		const file: File = files.item(0);
+		const fileReader: FileReader = new FileReader();
+		
+		fileReader.readAsText(file);
+		fileReader.onload = (() => {			
+			const data: string = fileReader.result as string;
+			const objFileReader = new ObjFileReader();
+			const newObj: SceneObject = objFileReader.toSceneObject(data);
+			
+			this.state.object.indexBuffer = newObj.indexBuffer;
+			this.state.object.vertexBuffer = newObj.vertexBuffer;
+		});
 	}
 
 	addTextureFile(files: FileList): any {
@@ -59,7 +76,7 @@ class SceneObjectEditor extends React.Component<SceneObjectEditorProps, SceneObj
 	render() {
 		let obj: SceneObject = this.state.object;
 		return (
-		<div className='scene-object'>
+		<div className='scene-object container card'>
 			<div className='row'>
 				<div className='col-10 vertically-align'>
 					<IoMdCube className='scene-object-icon'></IoMdCube>
@@ -76,7 +93,9 @@ class SceneObjectEditor extends React.Component<SceneObjectEditorProps, SceneObj
 
 			<div className='row'>
 				<div className='col'>
-					<VectorEditor name='Position' vector={obj.translation as number[]}></VectorEditor>
+					<VectorEditor name='Position' 
+						vector={obj.translation as number[]}
+					></VectorEditor>
 				</div>
 			</div>
 
@@ -89,6 +108,20 @@ class SceneObjectEditor extends React.Component<SceneObjectEditorProps, SceneObj
 			<div className='row'>
 				<div className='col'>
 					<VectorEditor name='Rotation' vector={obj.rotation as number[]}></VectorEditor>
+				</div>
+			</div>
+
+			<div className='row'>
+				<div className='col'>
+					<label className="form-label" htmlFor="customFile">Scene Object Model</label>
+					<input type="file" className="form-control" onChange={(e) => this.addModelFile(e.target.files)}/>
+				</div>
+			</div>
+
+			<div className='row'>
+				<div className='col'>
+					<label className="form-label" htmlFor="customFile">Scene Object Texture</label>
+					<input type="file" className="form-control" onChange={(e) => this.addTextureFile(e.target.files)}/>
 				</div>
 			</div>
 		</div>

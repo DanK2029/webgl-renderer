@@ -28,11 +28,13 @@ class VectorEditor extends React.Component<VectorEditorProps, VectorEditorProps>
         const vector: number[] = this.state.vector;
         return (
             <div className='row vector-editor'>
-                <div className='col vector-name'>{name}:</div>
+                <div className='col-3'>
+                    <p className='vector-name'>{name}:</p>
+                </div>
                 <div className="col vector-values input-group">
                     {vector.map((v: number, index: number) => {
                         return (
-                            <input type="number" key={index} className="form-control vector-value" 
+                            <input type="number" key={index} className='form-control vector-value' 
                                 defaultValue={v} onChange={(e) => {
                                     const stringVal: string = e.target.value;
                                     const valueNum: number = +stringVal
