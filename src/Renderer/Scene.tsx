@@ -193,9 +193,9 @@ class SceneObject {
 	clone(): SceneObject {
 		let clone = new SceneObject(this.vertexBuffer.clone(), this.indexBuffer.clone(), this.material.clone());
 		clone.name = this.name;
-		clone.translation = this.translation;
-		clone.scale = this.scale;
-		clone.rotation = this.rotation;
+		clone.translation = Array.from(this.translation) as vec3;
+		clone.scale = Array.from(this.scale) as vec3;
+		clone.rotation = Array.from(this.rotation) as vec3;
 		clone.updateFunction = this.updateFunction;
 		return clone;
 	}

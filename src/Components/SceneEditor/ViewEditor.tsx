@@ -22,6 +22,7 @@ interface MouseEventData {
 
 interface RendererProps {
 	/**TODO  Fill out if necessary*/
+	scene: Scene;
 }
 
 export class ViewEditor extends React.Component<RendererProps> {
@@ -36,6 +37,7 @@ export class ViewEditor extends React.Component<RendererProps> {
 
 	constructor(props: RendererProps) {
 		super(props);
+		this._scene = props.scene;
 		this._canvas = React.createRef<HTMLCanvasElement>();
 		this._container = React.createRef<HTMLDivElement>();
 		this._mouseData = {
@@ -53,7 +55,6 @@ export class ViewEditor extends React.Component<RendererProps> {
 			throw new Error('WebGL context not set!');
 		}
 		this._renderer = new Renderer(this._gl);
-		this._scene = this.context;
 
 		this._container.current.addEventListener('click', this.onClick.bind(this));
 		this._container.current.addEventListener('mouseup', this.onMouseUp.bind(this));
@@ -66,14 +67,14 @@ export class ViewEditor extends React.Component<RendererProps> {
 		this.resizeCanvas(width, height);		
 		this._canvas.current.addEventListener('resize', this.onResize.bind(this));
 
-		const scene: Scene = this.context;
 		let camera: Camera = new Camera(width/height, 90, 0.001, 1000);
 		camera.translation = [0, 0, 5];
-		scene.camera = camera;
-		scene.backgroundColor = [0.48, 0.54, 0.87, 1.0];
+		this._scene.camera = camera;
 
-		this._renderer.setup(scene);
-		this._renderer.drawScene(scene);
+		this._scene.backgroundColor = [0.48, 0.54, 0.87, 1.0];
+
+		this._renderer.setup(this._scene);
+		this._renderer.drawScene(this._scene);
 	}
 
 	onResize(event: Event): any {
@@ -107,12 +108,15 @@ export class ViewEditor extends React.Component<RendererProps> {
 
 	onMouseUp(event: MouseEvent) {
 		this._mouseData.isMousePressed = false;
+
 		const prevPos = this._mouseData.prevPos;
 		const curPos = this._mouseData.curPos;
+
 		this._mouseData.dragVec = {
 			x: prevPos.x - curPos.y,
 			y: prevPos.x - curPos.y
 		} as Point;
+
 		this._mouseData.dragDist = Math.sqrt(
 			Math.pow(this._mouseData.dragVec.x, 2) + Math.pow(this._mouseData.dragVec.x, 2)
 		);
