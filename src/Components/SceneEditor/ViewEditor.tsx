@@ -23,6 +23,7 @@ interface MouseEventData {
 interface RendererProps {
 	/**TODO  Fill out if necessary*/
 	scene: Scene;
+	setContext: (context: WebGL2RenderingContext) => void;
 }
 
 export class ViewEditor extends React.Component<RendererProps> {
@@ -50,11 +51,13 @@ export class ViewEditor extends React.Component<RendererProps> {
 	}
 
 	componentDidMount(): void {
+		console.log(this._gl);
 		this._gl = this._canvas.current.getContext('webgl2');
 		if (!this._gl) {
 			throw new Error('WebGL context not set!');
 		}
 		this._renderer = new Renderer(this._gl);
+		this.props.setContext(this._gl);
 
 		this._container.current.addEventListener('click', this.onClick.bind(this));
 		this._container.current.addEventListener('mouseup', this.onMouseUp.bind(this));
@@ -75,6 +78,9 @@ export class ViewEditor extends React.Component<RendererProps> {
 
 		this._renderer.setup(this._scene);
 		this._renderer.drawScene(this._scene);
+	}
+
+	componentWillUnmount(): void {
 	}
 
 	onResize(event: Event): any {

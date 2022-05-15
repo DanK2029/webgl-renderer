@@ -82,6 +82,12 @@ class Scene {
 		});
 		this.tick();
 	}
+
+	resetCreated(): void {
+		this._objectList.forEach((obj: SceneObject) => {
+			obj.resetCreated();
+		});
+	}
 }
 
 class SceneObject {
@@ -198,6 +204,14 @@ class SceneObject {
 		clone.rotation = Array.from(this.rotation) as vec3;
 		clone.updateFunction = this.updateFunction;
 		return clone;
+	}
+
+	resetCreated(): void {
+		this._indexBuffer.created = false;
+		this._vertexBuffer.created = false;
+		this._material.program.created = false;
+		this._material.program.vertexShader.created = false;
+		this._material.program.fragmentShader.created = false;
 	}
 }
 

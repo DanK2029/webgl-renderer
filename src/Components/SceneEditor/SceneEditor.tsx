@@ -12,17 +12,18 @@ import './SceneEditor.scss';
 type EventCallback = (event: any) => void;
 
 interface SceneEditorProps {
-	
+	scene: Scene;
+	setContext: (context: WebGL2RenderingContext) => void;
 }
 
 class SceneEditor extends React.Component<SceneEditorProps> {
 
-	private _deltaTime: number = 0.01;
 	private _scene: Scene;
+	private _renderingContext: WebGL2RenderingContext;
 
 	constructor(props: SceneEditorProps) {
 		super(props);
-		this._scene = new Scene(this._deltaTime);
+		this._scene = this.props.scene;
 	}
 
 	addSceneObject(name: string = 'New Scene Object') {
@@ -38,12 +39,16 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 		this.forceUpdate();
 	}
 
+	private setContext(context: WebGL2RenderingContext): void {
+		this.props.setContext(context);
+	}
+
 	render() {
 		return (
 		<div className='container-fluid'>
 			<div className='row'>
 				<div className='col-9'>
-					<ViewEditor scene={this._scene}></ViewEditor>
+					<ViewEditor scene={this._scene} setContext={this.setContext.bind(this)}></ViewEditor>
 				</div>
 				<div className='col-3'>
 					<div className='scene-editor'>
