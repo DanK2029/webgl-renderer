@@ -2,7 +2,8 @@ import { vec3, vec4, mat4, quat, glMatrix } from 'gl-matrix';
 import * as uniqid from 'uniqid'
 
 import { VertexBuffer, IndexBuffer, VertexBufferLayout } from './Buffer';
-import { Material } from './Material';
+import { Material, MaterialProperty, MaterialPropertyType } from './Material';
+import { Texture } from './Texture';
 
 type UpdateFunction = (time: number, object: SceneObject | Camera) => void;
 
@@ -209,9 +210,20 @@ class SceneObject {
 	resetCreated(): void {
 		this._indexBuffer.created = false;
 		this._vertexBuffer.created = false;
+
 		this._material.program.created = false;
 		this._material.program.vertexShader.created = false;
 		this._material.program.fragmentShader.created = false;
+		
+		this._material.properties.forEach((prop: MaterialProperty) => {
+			switch (prop.type) {
+				case MaterialPropertyType.TEXTURE:
+					const texture: Texture = prop.value as Texture;
+					texture.created = false;
+					texture.loaded = false;
+					break;
+			}
+		})
 	}
 }
 

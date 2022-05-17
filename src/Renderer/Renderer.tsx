@@ -12,11 +12,8 @@ class Renderer {
 	private _gl: WebGL2RenderingContext;
 
 	constructor(gl: WebGL2RenderingContext) {
+		console.log('Renderer Constructor');
 		this._gl = gl;
-	}
-
-	setup(scene: Scene): void {
-
 	}
 
 	preprocessScene(scene: Scene): void {
@@ -94,6 +91,7 @@ class Renderer {
 
 	createVertexBuffer(buffer: VertexBuffer): void {
 		buffer.buffer = this._gl.createBuffer();
+		console.log(buffer.buffer);
 		buffer.created = true;
 		this.bindVertexBuffer(buffer);
 		this._gl.bufferData(this._gl.ARRAY_BUFFER, buffer.vertices, this._gl.STATIC_DRAW);
@@ -187,9 +185,6 @@ class Renderer {
 		this._gl.uniformMatrix4fv(location, false, mat4);
 	}
 
-
-
-	// TODO: change function so vertexAttribPointer parameters can be stored locally including stride on total layout
 	setVertexAttributes(shaderProgram: ShaderProgram, vertexLayout: VertexBufferLayout): void {
 		this.useProgram(shaderProgram);
 		let offset: number = 0;

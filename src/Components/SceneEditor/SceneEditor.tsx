@@ -9,19 +9,16 @@ import { empty } from '../../res/TestObjects/Empty';
 import 'bootstrap'
 import './SceneEditor.scss';
 
-type EventCallback = (event: any) => void;
-
 interface SceneEditorProps {
 	scene: Scene;
-	setContext: (context: WebGL2RenderingContext) => void;
 }
 
 class SceneEditor extends React.Component<SceneEditorProps> {
 
 	private _scene: Scene;
-	private _renderingContext: WebGL2RenderingContext;
 
 	constructor(props: SceneEditorProps) {
+		console.log('Scene Editor Constructor')
 		super(props);
 		this._scene = this.props.scene;
 	}
@@ -39,8 +36,10 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 		this.forceUpdate();
 	}
 
-	private setContext(context: WebGL2RenderingContext): void {
-		this.props.setContext(context);
+	componentWillUnmount(): void {
+		this._scene.objectList.forEach((obj: SceneObject) => {
+			obj.resetCreated();
+		});
 	}
 
 	render() {
@@ -48,7 +47,7 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 		<div className='container-fluid'>
 			<div className='row'>
 				<div className='col-9'>
-					<ViewEditor scene={this._scene} setContext={this.setContext.bind(this)}></ViewEditor>
+					<ViewEditor scene={this._scene}></ViewEditor>
 				</div>
 				<div className='col-3'>
 					<div className='scene-editor'>

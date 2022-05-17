@@ -55,6 +55,10 @@ class Texture {
 	get height(): number {
 		return this._height;
 	}
+
+	resetCreated(): void {
+		this._created = false;
+	}
 }
 
 export { Texture }

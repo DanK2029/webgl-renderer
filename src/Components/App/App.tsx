@@ -10,17 +10,24 @@ import { MaterialEditor } from '../MaterialEditor/MaterialEditor';
 
 import 'bootstrap'
 import './App.scss'
+import { Shader } from '../../Renderer/Shader';
 
 
-enum AppState {
+enum EditorState {
 	EDIT_SCENE = 'EDIT_SCENE',
 	EDIT_MATERIAL = 'EDIT_MATERIAL',
 	EDIT_SHADER = 'EDIT_SHADER'
 }
 
-export default class App extends React.Component {
+interface AppState {
+	editorState: EditorState;
+}
 
-	private _state: AppState;
+interface AppProps {
+
+}
+
+export default class App extends React.Component<AppProps, AppState> {
 
 	private _deltaTime: number;
 	private _scene: Scene;
@@ -31,33 +38,29 @@ export default class App extends React.Component {
 		
 		this._deltaTime = 0.01;
 		this._scene = new Scene(this._deltaTime);
-		this._state = AppState.EDIT_SCENE;
+
+		this.state = {
+			editorState: EditorState.EDIT_SCENE
+		}
 	}
 
-	recieveEvent(event: any) {
+	private switchAppState(editorState: EditorState): void {
+		this.setState({
+			editorState: editorState
+		});
 	}
 
-	private switchAppState(state: AppState): void {
-		this._state = state;
-		this.forceUpdate();
-	}
-
-	private setContext(context: WebGL2RenderingContext): void {
-		this._renderingContext = context;
-	}
-
-	private getAppStateComponent() {
-		switch (this._state) {
-			case AppState.EDIT_SCENE:
+	private getEditorStateComponent() {
+		switch (this.state.editorState) {
+			case EditorState.EDIT_SCENE:
 				return <SceneEditor 
 					scene={this._scene}
-					setContext={this.setContext.bind(this)}
 				></SceneEditor>;
 			
-			case AppState.EDIT_SHADER:
+			case EditorState.EDIT_SHADER:
 				return <ShaderEditor></ShaderEditor>;
 			
-			case AppState.EDIT_MATERIAL:
+			case EditorState.EDIT_MATERIAL:
 				return <MaterialEditor></MaterialEditor>;
 		}
 	}
@@ -75,17 +78,17 @@ export default class App extends React.Component {
 						<div className='collapse navbar-collapse'>
 							<ul className='navbar-nav'>
 								<li className='nav-item'>
-									<span onClick={() => this.switchAppState(AppState.EDIT_SCENE)}>
+									<span onClick={() => this.switchAppState(EditorState.EDIT_SCENE)}>
 										Scene Editor
 									</span>
 								</li>
 								<li className='nav-item'>
-									<span onClick={() => this.switchAppState(AppState.EDIT_SHADER)}>
+									<span onClick={() => this.switchAppState(EditorState.EDIT_SHADER)}>
 										Shader Editor
 									</span>
 								</li>
 								<li className='nav-item'>
-									<span onClick={() => this.switchAppState(AppState.EDIT_MATERIAL)}>
+									<span onClick={() => this.switchAppState(EditorState.EDIT_MATERIAL)}>
 										Material Editor
 									</span>
 								</li>
@@ -94,7 +97,7 @@ export default class App extends React.Component {
 					</div>
 				</nav>
 
-				{this.getAppStateComponent()}
+				{this.getEditorStateComponent()}
 			</div>
 		);
 	}

@@ -21,9 +21,7 @@ interface MouseEventData {
 }
 
 interface RendererProps {
-	/**TODO  Fill out if necessary*/
 	scene: Scene;
-	setContext: (context: WebGL2RenderingContext) => void;
 }
 
 export class ViewEditor extends React.Component<RendererProps> {
@@ -37,6 +35,7 @@ export class ViewEditor extends React.Component<RendererProps> {
 	private _mouseData: MouseEventData;
 
 	constructor(props: RendererProps) {
+		console.log('View Editor Constructor');
 		super(props);
 		this._scene = props.scene;
 		this._canvas = React.createRef<HTMLCanvasElement>();
@@ -51,13 +50,11 @@ export class ViewEditor extends React.Component<RendererProps> {
 	}
 
 	componentDidMount(): void {
-		console.log(this._gl);
 		this._gl = this._canvas.current.getContext('webgl2');
 		if (!this._gl) {
 			throw new Error('WebGL context not set!');
 		}
 		this._renderer = new Renderer(this._gl);
-		this.props.setContext(this._gl);
 
 		this._container.current.addEventListener('click', this.onClick.bind(this));
 		this._container.current.addEventListener('mouseup', this.onMouseUp.bind(this));
@@ -70,17 +67,14 @@ export class ViewEditor extends React.Component<RendererProps> {
 		this.resizeCanvas(width, height);		
 		this._canvas.current.addEventListener('resize', this.onResize.bind(this));
 
-		let camera: Camera = new Camera(width/height, 90, 0.001, 1000);
+		let camera: Camera = new Camera(width/height, 45, 0.001, 1000);
 		camera.translation = [0, 0, 5];
 		this._scene.camera = camera;
 
 		this._scene.backgroundColor = [0.48, 0.54, 0.87, 1.0];
 
-		this._renderer.setup(this._scene);
+		console.log('view calling draw scene')
 		this._renderer.drawScene(this._scene);
-	}
-
-	componentWillUnmount(): void {
 	}
 
 	onResize(event: Event): any {
@@ -148,7 +142,7 @@ export class ViewEditor extends React.Component<RendererProps> {
 		);
 
 		if (this._mouseData.isMousePressed) {
-			const s: number = 70;
+			const s: number = 40;
 			this._scene.camera.rotate(
 				s * this._mouseData.dragVec.y, 
 				s * this._mouseData.dragVec.x, 

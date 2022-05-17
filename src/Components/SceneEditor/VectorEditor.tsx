@@ -7,8 +7,6 @@ interface VectorEditorProps {
     vector: number[];
 }
 
-
-
 class VectorEditor extends React.Component<VectorEditorProps, VectorEditorProps> {
 
     constructor(props: VectorEditorProps) {

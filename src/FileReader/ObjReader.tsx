@@ -117,7 +117,6 @@ class ObjFileReader {
 	}
 
 	private createVertexBuffer(): VertexBuffer {
-		console.log(this._indices);
 		const vertices: number[] = Object.values(this._globalVertexMap)
 			.sort((v1: FaceVertex, v2: FaceVertex) => v1.index < v2.index ? -1 : 1)
 			.flatMap((v: FaceVertex) => {
@@ -197,15 +196,21 @@ class ObjFileReader {
 	}
 
 	private addVertex(x: string, y: string, z: string) {
-		this._vertexLists.position.list.push([Number.parseFloat(x), Number.parseFloat(y), Number.parseFloat(z)]);
+		this._vertexLists.position.list.push(
+			[Number.parseFloat(x), Number.parseFloat(y), Number.parseFloat(z)]
+		);
 	}
 
 	private addTextureCoord(u: string, v: string) {
-		this._vertexLists.texCoord.list.push([Number.parseFloat(u), 1 - Number.parseFloat(v)]);
+		this._vertexLists.texCoord.list.push(
+			[Number.parseFloat(u), 1 - Number.parseFloat(v)]
+		);
 	}
 
 	private addNormal(x: string, y: string, z: string) {
-		this._vertexLists.normal.list.push([Number.parseFloat(x), Number.parseFloat(y), Number.parseFloat(z)]);
+		this._vertexLists.normal.list.push(
+			[Number.parseFloat(x), Number.parseFloat(y), Number.parseFloat(z)]
+		);
 	}
 
 	private addFace(indices: string[]): void {
