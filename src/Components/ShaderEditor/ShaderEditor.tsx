@@ -8,7 +8,6 @@ class ShaderEditor extends React.Component<ShaderEditorProps> {
 
 	constructor(props: ShaderEditorProps) {
 		super(props);
-		console.log('Shader Editor Coinstructor')
 	}
 
 	render(): React.ReactNode {

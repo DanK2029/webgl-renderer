@@ -18,7 +18,6 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 	private _scene: Scene;
 
 	constructor(props: SceneEditorProps) {
-		console.log('Scene Editor Constructor')
 		super(props);
 		this._scene = this.props.scene;
 	}
