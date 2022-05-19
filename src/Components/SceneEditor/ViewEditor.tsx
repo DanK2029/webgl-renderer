@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Camera, Scene } from './../../Renderer/Scene';
+import { Camera, Scene, SceneObject } from './../../Renderer/Scene';
 import { Renderer } from './../../Renderer/Renderer';
 
 import { SceneContext } from './../Context/SceneContext';
@@ -35,17 +35,20 @@ export class ViewEditor extends React.Component<RendererProps> {
 	private _mouseData: MouseEventData;
 
 	constructor(props: RendererProps) {
-		console.log('View Editor Constructor');
 		super(props);
 		this._scene = props.scene;
+		this._scene.objectList.forEach((obj: SceneObject) => {
+			obj.resetCreated();
+		})
+
 		this._canvas = React.createRef<HTMLCanvasElement>();
 		this._container = React.createRef<HTMLDivElement>();
 		this._mouseData = {
-			prevPos: {x: 0, y: 0} as Point,
-			curPos: {x: 0, y: 0} as Point,
+			prevPos: {x: 0, y: 0},
+			curPos: {x: 0, y: 0},
 			isMousePressed: false,
 			dragDist: 0,
-			dragVec: {x: 0, y: 0} as Point,
+			dragVec: {x: 0, y: 0},
 		} as MouseEventData;
 	}
 
@@ -73,8 +76,11 @@ export class ViewEditor extends React.Component<RendererProps> {
 
 		this._scene.backgroundColor = [0.48, 0.54, 0.87, 1.0];
 
-		console.log('view calling draw scene')
 		this._renderer.drawScene(this._scene);
+	}
+
+	componentWillUnmount(): void {
+		this._renderer.stopDrawingScene();
 	}
 
 	onResize(event: Event): any {

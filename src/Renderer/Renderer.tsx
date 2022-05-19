@@ -10,9 +10,9 @@ import { Scene, SceneObject, Camera } from './Scene';
 class Renderer {
 
 	private _gl: WebGL2RenderingContext;
+	private _curAnimationRequestId: number;
 
 	constructor(gl: WebGL2RenderingContext) {
-		console.log('Renderer Constructor');
 		this._gl = gl;
 	}
 
@@ -78,7 +78,7 @@ class Renderer {
 			this.unbindSceneObject();
 		})
 
-		requestAnimationFrame((() => {
+		this._curAnimationRequestId = requestAnimationFrame((() => {
 			this.drawScene(scene)
 		}).bind(this));
 	}
@@ -87,11 +87,14 @@ class Renderer {
 		this._gl.drawElements(mode, count, type, 0);
 	}
 
+	stopDrawingScene(): void {
+		cancelAnimationFrame(this._curAnimationRequestId);
+	}
+
 	// ~~~~~~~~~~ BUFFER ~~~~~~~~~~
 
 	createVertexBuffer(buffer: VertexBuffer): void {
 		buffer.buffer = this._gl.createBuffer();
-		console.log(buffer.buffer);
 		buffer.created = true;
 		this.bindVertexBuffer(buffer);
 		this._gl.bufferData(this._gl.ARRAY_BUFFER, buffer.vertices, this._gl.STATIC_DRAW);
