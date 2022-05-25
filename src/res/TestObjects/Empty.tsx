@@ -83,7 +83,7 @@ const material: Material = new Material(shaderProgram, [
 		name: 'color',
 		value: [0.86, 0.34, 0.56, 1]
 	}
-])
+]);
 
 const empty: SceneObject = new SceneObject(vertexBuffer, indexBuffer, material);
 empty.name = 'Empty Scene Object';

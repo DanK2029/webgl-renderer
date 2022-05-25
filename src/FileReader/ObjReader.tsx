@@ -2,7 +2,6 @@ import { vec2, vec3 } from 'gl-matrix';
 
 import { IndexBuffer, VertexBuffer, VertexBufferLayout, VertexTypes, VertexLayout } from '../Renderer/Buffer';
 import { SceneObject } from '../Renderer/Scene';
-import { Material } from '../Renderer/Material';
 
 import { cube } from '../res/TestObjects/Cube';
 
@@ -94,22 +93,22 @@ class ObjFileReader {
 					type: layout.type,
 					normalized: layout.normalized
 				};
-			}
-		));
+			}));
 
-		this.reset()
+		this.reset();
 	}
 
 	public reset() {
 		this._indices = [];
 	}
 
-	public toSceneObject(data: string, name: string = 'New OBJ Model'): SceneObject {
+	public toSceneObject(data: string, name = 'New OBJ Model'): SceneObject {
 		data.split('\n').forEach((line: string) => {
 			line && this.parseLine(line.trim());
 		});
 		
-		let sceneObject: SceneObject = cube.clone();
+		const sceneObject: SceneObject = cube.clone();
+		sceneObject.name = name;
 		sceneObject.vertexBuffer = this.createVertexBuffer();
 		sceneObject.indexBuffer = new IndexBuffer(new Uint32Array(this._indices));
 
@@ -120,7 +119,7 @@ class ObjFileReader {
 		const vertices: number[] = Object.values(this._globalVertexMap)
 			.sort((v1: FaceVertex, v2: FaceVertex) => v1.index < v2.index ? -1 : 1)
 			.flatMap((v: FaceVertex) => {
-				let vertexData: number[] = [];
+				const vertexData: number[] = [];
 
 				const positionData = v.vertexData as number[];
 				const textureCoordData = v.textureCoordData as number[];
@@ -137,7 +136,7 @@ class ObjFileReader {
 	}
 
 	public parseLine(line: string) {
-		let tokens: string[] = line.replace(/\s\s+/g, ' ').split(' ');
+		const tokens: string[] = line.replace(/\s\s+/g, ' ').split(' ');
 		tokens.forEach(token => token.trim());
 		const lineType = tokens[0];
 		
@@ -148,7 +147,7 @@ class ObjFileReader {
 			
 			case OBJ_FILE_KEYWORDS.VERTEX:
 				// console.log('Parsing vertex...');
-				this.addVertex(tokens[1], tokens[2], tokens[3])
+				this.addVertex(tokens[1], tokens[2], tokens[3]);
 				break;
 
 			case OBJ_FILE_KEYWORDS.TEXTURE_COORD:
@@ -157,7 +156,7 @@ class ObjFileReader {
 			
 			case OBJ_FILE_KEYWORDS.VERTEX_NORMAL:
 				// console.log('Parsing normal...');
-				this.addNormal(tokens[1], tokens[2], tokens[3])
+				this.addNormal(tokens[1], tokens[2], tokens[3]);
 				break;
 			
 			case OBJ_FILE_KEYWORDS.VERTEX_PARAMETER:
@@ -166,7 +165,7 @@ class ObjFileReader {
 			
 			case OBJ_FILE_KEYWORDS.FACE:
 				// console.log('Parsing face...');
-				this.addFace(tokens.slice(1))
+				this.addFace(tokens.slice(1));
 				break;
 			
 			case OBJ_FILE_KEYWORDS.LINE:
@@ -215,8 +214,8 @@ class ObjFileReader {
 
 	private addFace(indices: string[]): void {
 		const numIndices: number = indices.length;
-		let faceVertices: FaceVertex[] = indices.map((token: string) => {
-			return this.parseFaceToken(token)
+		const faceVertices: FaceVertex[] = indices.map((token: string) => {
+			return this.parseFaceToken(token);
 		});
 		
 		let triangles: FaceTriangle[] = [];
@@ -233,9 +232,9 @@ class ObjFileReader {
 		}
 
 		triangles.forEach((tri: FaceTriangle) => {
-			let faceIndices: number[] = new Array<number>();
+			const faceIndices: number[] = new Array<number>();
 			[tri.v0, tri.v1, tri.v2].forEach((vertex: FaceVertex) => {
-				const vertexId: string = `${vertex.vertexIndex}/${vertex.textureCoordIndex}/${vertex.normalIndex}`;
+				const vertexId = `${vertex.vertexIndex}/${vertex.textureCoordIndex}/${vertex.normalIndex}`;
 				if (!this._globalVertexMap[vertexId]) {
 					vertex.index = this._vertexCounter++;
 					this._globalVertexMap[vertexId] = vertex;
@@ -255,14 +254,14 @@ class ObjFileReader {
 		 * 		- adding center point and create triangles from center point
 		 * 		- triangle fan from one vertex
 		 */
-		let trianlges: FaceTriangle[] = [];
+		const trianlges: FaceTriangle[] = [];
 		const rootVertex = faceVertices[0];
 		for (let i = 2; i < faceVertices.length; i++) {
 			trianlges.push({
 				v2: faceVertices[i],
 				v1: faceVertices[i-1],
 				v0: rootVertex,
-			})
+			});
 		}
 		return trianlges;
 	}
@@ -304,4 +303,4 @@ class ObjFileReader {
 }
 
 
-export { ObjFileReader }
+export { ObjFileReader };

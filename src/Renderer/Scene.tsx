@@ -1,11 +1,11 @@
 import { vec3, vec4, mat4, quat, glMatrix } from 'gl-matrix';
-import * as uniqid from 'uniqid'
+import * as uniqid from 'uniqid';
 
-import { VertexBuffer, IndexBuffer, VertexBufferLayout } from './Buffer';
+import { VertexBuffer, IndexBuffer } from './Buffer';
 import { Material, MaterialProperty, MaterialPropertyType } from './Material';
 import { Texture } from './Texture';
 
-type UpdateFunction = (time: number, object: SceneObject | Camera) => void;
+type UpdateFunction = (time: number, object: SceneObject | Camera) => void | (() => undefined);
 
 class Scene {
 
@@ -64,7 +64,7 @@ class Scene {
 	deleteObject(id: string) {
 		this._objectList = this._objectList.filter((obj: SceneObject) => (
 			obj.id !== id
-		))
+		));
 	}
 
 	tick(): void {
@@ -113,7 +113,7 @@ class SceneObject {
 		this._scale = [1, 1, 1];
 		this._rotation = [0, 0, 0];
 		this._transform = mat4.create();
-		this._updateFunction = (time: number, obj: SceneObject) => {};
+		this._updateFunction = () => undefined;
 	}
 
 	get name(): string {
@@ -172,20 +172,25 @@ class SceneObject {
 		this._rotation = vec;
 	}
 
+	get rotation(): vec3 {
+		return this._rotation;
+	}
+
 	rotate(dx: number, dy: number, dz: number) {
 		this._rotation = [
 			this._rotation[0] + dx,
 			this._rotation[1] + dy,
 			this._rotation[2] + dz
-		]
+		];
 	}
 
-	get rotation(): vec3 {
-		return this._rotation;
+	updateGeometry(indexBuffer: IndexBuffer, vertexBuffer: VertexBuffer): void {
+		this._indexBuffer = indexBuffer;
+		this._vertexBuffer = vertexBuffer;
 	}
 
 	get transform(): mat4 {
-		let rotation: quat = quat.fromEuler(quat.create(), this.rotation[0], this.rotation[1], this.rotation[2]);
+		const rotation: quat = quat.fromEuler(quat.create(), this.rotation[0], this.rotation[1], this.rotation[2]);
 		return mat4.fromRotationTranslationScale(this._transform, rotation, this.translation, this.scale);
 	}
 
@@ -198,7 +203,7 @@ class SceneObject {
 	}
 
 	clone(): SceneObject {
-		let clone = new SceneObject(this.vertexBuffer.clone(), this.indexBuffer.clone(), this.material.clone());
+		const clone = new SceneObject(this.vertexBuffer.clone(), this.indexBuffer.clone(), this.material.clone());
 		clone.name = this.name;
 		clone.translation = Array.from(this.translation) as vec3;
 		clone.scale = Array.from(this.scale) as vec3;
@@ -217,13 +222,14 @@ class SceneObject {
 		
 		this._material.properties.forEach((prop: MaterialProperty) => {
 			switch (prop.type) {
-				case MaterialPropertyType.TEXTURE:
+				case MaterialPropertyType.TEXTURE: {
 					const texture: Texture = prop.value as Texture;
 					texture.created = false;
 					texture.loaded = false;
 					break;
+				}
 			}
-		})
+		});
 	}
 }
 
@@ -244,7 +250,7 @@ class Camera {
 		this._viewMatrix = mat4.create();
 		this._rotation = [0, 0, 0];
 		this._transform = mat4.create();
-		this._updateFunction = (time: number, cam: Camera) => {};
+		this._updateFunction = () => undefined;
 	}
 
 	get aspectRatio(): number {
@@ -260,7 +266,7 @@ class Camera {
 	}
 
 	get viewMatrix(): mat4 {
-		let rotation: quat = quat.fromEuler(quat.create(), this._rotation[0], this._rotation[1], this._rotation[2]);
+		const rotation: quat = quat.fromEuler(quat.create(), this._rotation[0], this._rotation[1], this._rotation[2]);
 		mat4.fromRotationTranslation(this._transform, rotation, this._translation);
 		return mat4.invert(this._viewMatrix, this._transform);
 	}
@@ -277,20 +283,20 @@ class Camera {
 		return this._rotation;
 	}
 
+	set rotation(vec: vec3) {
+		this._rotation = vec;
+	}
+
 	rotate(dx: number, dy: number, dz: number) {
 		this._rotation = [
 			this._rotation[0] + dx,
 			this._rotation[1] + dy,
 			this._rotation[2] + dz
-		]
-	}
-
-	set rotation(vec: vec3) {
-		this._rotation = vec;
-	}
+		];
+	}	
 
 	get transform(): mat4 {
-		let r: quat = quat.fromEuler(quat.create(), this._rotation[0], this._rotation[1], this._rotation[2]);
+		const r: quat = quat.fromEuler(quat.create(), this._rotation[0], this._rotation[1], this._rotation[2]);
 		return mat4.fromRotationTranslation(this._transform, r, this.translation);
 	}
 

@@ -8,10 +8,8 @@ import { SceneEditor } from '../SceneEditor/SceneEditor';
 import { ShaderEditor } from '../ShaderEditor/ShaderEditor';
 import { MaterialEditor } from '../MaterialEditor/MaterialEditor';
 
-import 'bootstrap'
-import './App.scss'
-import { Shader } from '../../Renderer/Shader';
-
+import 'bootstrap';
+import './App.scss';
 
 enum EditorState {
 	EDIT_SCENE = 'EDIT_SCENE',
@@ -23,17 +21,12 @@ interface AppState {
 	editorState: EditorState;
 }
 
-interface AppProps {
-
-}
-
-export default class App extends React.Component<AppProps, AppState> {
+export default class App extends React.Component<Record<string, never>, AppState> {
 
 	private _deltaTime: number;
 	private _scene: Scene;
-	private _renderingContext: WebGL2RenderingContext;
 
-	constructor(props: any) {
+	constructor(props: Record<string, never>) {
 		super(props);
 		
 		this._deltaTime = 0.01;
@@ -41,7 +34,7 @@ export default class App extends React.Component<AppProps, AppState> {
 
 		this.state = {
 			editorState: EditorState.EDIT_SCENE
-		}
+		};
 	}
 
 	private switchAppState(editorState: EditorState): void {

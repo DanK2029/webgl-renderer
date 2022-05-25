@@ -36,7 +36,7 @@ class Renderer {
 
 			obj.material.properties.forEach((prop: MaterialProperty) => {
 				switch (prop.type) {
-					case MaterialPropertyType.TEXTURE:
+					case MaterialPropertyType.TEXTURE: {
 						const texture: Texture = prop.value as Texture;
 						if (!texture.created) {
 							this.createTexture(texture);
@@ -47,8 +47,9 @@ class Renderer {
 						}
 
 						break;
+					}
 				}
-			})
+			});
 		});
 
 		this.setClearColor(scene.backgroundColor);
@@ -76,10 +77,10 @@ class Renderer {
 
 			this.drawElements(this._gl.TRIANGLES, obj.indexBuffer.length, this._gl.UNSIGNED_INT);
 			this.unbindSceneObject();
-		})
+		});
 
 		this._curAnimationRequestId = requestAnimationFrame((() => {
-			this.drawScene(scene)
+			this.drawScene(scene);
 		}).bind(this));
 	}
 
@@ -190,9 +191,9 @@ class Renderer {
 
 	setVertexAttributes(shaderProgram: ShaderProgram, vertexLayout: VertexBufferLayout): void {
 		this.useProgram(shaderProgram);
-		let offset: number = 0;
+		let offset = 0;
 		const stride: number = vertexLayout.layout.map((attribute: VertexLayout) => {
-			return this.getTypeSize(attribute.type) * attribute.size
+			return this.getTypeSize(attribute.type) * attribute.size;
 		}).reduce((total: number, cur: number) => (total += cur));
 
 		vertexLayout.layout.forEach((attribute: VertexLayout) => {
@@ -213,7 +214,7 @@ class Renderer {
 	// ~~~~~~~~~~ TEXTURE ~~~~~~~~~~
 
 	createTexture(texture: Texture): void {
-		texture.texture = this._gl.createTexture()
+		texture.texture = this._gl.createTexture();
 		texture.created = true;
 	}
 
@@ -261,7 +262,7 @@ class Renderer {
 					this.setUniform1i(shaderProgram, name, 0);
 					break;
 			}
-		})
+		});
 	}
 
 	// ~~~~~~~~~~ RENDERER ~~~~~~~~~~
@@ -318,4 +319,4 @@ class Renderer {
 	}
 }
 
-export { Renderer }
+export { Renderer };

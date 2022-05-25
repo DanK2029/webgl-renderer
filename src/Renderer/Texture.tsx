@@ -61,4 +61,4 @@ class Texture {
 	}
 }
 
-export { Texture }
+export { Texture };

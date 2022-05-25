@@ -1,12 +1,12 @@
 import * as React from 'react';
 
-interface ShaderEditorProps {
+// interface ShaderEditorProps {
 
-}
+// }
 
-class ShaderEditor extends React.Component<ShaderEditorProps> {
+class ShaderEditor extends React.Component<Record<string, never>> {
 
-	constructor(props: ShaderEditorProps) {
+	constructor(props: Record<string, never>) {
 		super(props);
 	}
 
@@ -15,8 +15,8 @@ class ShaderEditor extends React.Component<ShaderEditorProps> {
 			<div>
 				Shader Editor
 			</div>
-		)
+		);
 	}
 }
 
-export { ShaderEditor }
+export { ShaderEditor };

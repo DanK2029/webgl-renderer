@@ -35,7 +35,7 @@ const indexBuffer: IndexBuffer = new IndexBuffer(
 	new Uint32Array([
 		2, 1, 0
 	])
-)
+);
 
 const vertexShader: Shader = new Shader(
 	`
@@ -86,7 +86,7 @@ const material: Material = new Material(shaderProgram, [
 		name: 'color',
 		value: [1, 0, 0, 1]
 	}
-])
+]);
 
 const triangle: SceneObject = new SceneObject(vertexBuffer, indexBuffer, material);
 triangle.name = 'Triangle';

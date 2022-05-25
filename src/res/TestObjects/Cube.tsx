@@ -5,17 +5,17 @@ import { SceneObject } from '../../Renderer/Scene';
 
 const vertexBuffer: VertexBuffer = new VertexBuffer(
 	new Float32Array([
-		 1,  1,  1,
-		 0.86, 0.45, 0.25, 1,
+		1,  1,  1,
+		0.86, 0.45, 0.25, 1,
 
-		 1,  1, -1,
-		 0.86, 0.86, 0.25, 1,
+		1,  1, -1,
+		0.86, 0.86, 0.25, 1,
 
-		 1, -1,  1,
-		 0.25, 0.86, 0.25, 1,
-		 
-		 1, -1, -1,
-		 0.45, 0.86, 0.86, 1,
+		1, -1,  1,
+		0.25, 0.86, 0.25, 1,
+		
+		1, -1, -1,
+		0.45, 0.86, 0.86, 1,
 
 		-1,  1,  1,
 		0.25, 0.25, 0.86, 1,
@@ -119,7 +119,7 @@ const material: Material = new Material(shaderProgram, [
 		name: 'color',
 		value: [0.86, 0.34, 0.56, 1]
 	}
-])
+]);
 
 const cube: SceneObject = new SceneObject(vertexBuffer, indexBuffer, material);
 cube.name = 'Cube';

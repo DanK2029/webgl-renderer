@@ -1,22 +1,22 @@
 import * as React from 'react';
 
-interface MaterialEditorProps {
+// interface MaterialEditorProps {
+	
+// }
 
-}
+class MaterialEditor extends React.Component<Record<string, never>> {
 
-class MaterialEditor extends React.Component<MaterialEditorProps> {
-
-	constructor(props: MaterialEditorProps) {
+	constructor(props: Record<string, never>) {
 		super(props);
 	}
 
 	render(): React.ReactNode {
 		return (
-			<div>
-				Material Editor
+			<div className='container-fluid'>
+				<div className='row'></div>
 			</div>
-		)
+		);
 	}
 }
 
-export { MaterialEditor }
+export { MaterialEditor };

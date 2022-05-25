@@ -3,9 +3,7 @@ import * as React from 'react';
 import { Camera, Scene, SceneObject } from './../../Renderer/Scene';
 import { Renderer } from './../../Renderer/Renderer';
 
-import { SceneContext } from './../Context/SceneContext';
-
-import './ViewEditor.scss'
+import './ViewEditor.scss';
 
 interface Point {
 	x: number;
@@ -39,7 +37,7 @@ export class ViewEditor extends React.Component<RendererProps> {
 		this._scene = props.scene;
 		this._scene.objectList.forEach((obj: SceneObject) => {
 			obj.resetCreated();
-		})
+		});
 
 		this._canvas = React.createRef<HTMLCanvasElement>();
 		this._container = React.createRef<HTMLDivElement>();
@@ -59,18 +57,15 @@ export class ViewEditor extends React.Component<RendererProps> {
 		}
 		this._renderer = new Renderer(this._gl);
 
-		this._container.current.addEventListener('click', this.onClick.bind(this));
 		this._container.current.addEventListener('mouseup', this.onMouseUp.bind(this));
 		this._container.current.addEventListener('mousedown', this.onMouseDown.bind(this));
 		this._container.current.addEventListener('mousemove', this.onMouseMove.bind(this));
-		
-		document.addEventListener('keydown', this.onKeyDown.bind(this));
 
 		const { width, height } = this._container.current.getBoundingClientRect();
 		this.resizeCanvas(width, height);		
 		this._canvas.current.addEventListener('resize', this.onResize.bind(this));
 
-		let camera: Camera = new Camera(width/height, 45, 0.001, 1000);
+		const camera: Camera = new Camera(width/height, 45, 0.001, 1000);
 		camera.translation = [0, 0, 5];
 		this._scene.camera = camera;
 
@@ -83,7 +78,7 @@ export class ViewEditor extends React.Component<RendererProps> {
 		this._renderer.stopDrawingScene();
 	}
 
-	onResize(event: Event): any {
+	onResize(): void {
 		const width: number = this._container.current.clientWidth;
 		const height: number = this._container.current.clientHeight;
 		this.resizeCanvas(width, height);
@@ -99,10 +94,7 @@ export class ViewEditor extends React.Component<RendererProps> {
 		return {
 			x: -(2 * point.x / this._canvas.current.width) - 1.0,
 			y: -(2 * point.y / this._canvas.current.height) - 1.0,
-		}
-	}
-
-	onClick(event: MouseEvent) {
+		};
 	}
 	
 	onMouseDown(event: MouseEvent) {
@@ -112,7 +104,7 @@ export class ViewEditor extends React.Component<RendererProps> {
 		);
 	}
 
-	onMouseUp(event: MouseEvent) {
+	onMouseUp() {
 		this._mouseData.isMousePressed = false;
 
 		const prevPos = this._mouseData.prevPos;
@@ -148,7 +140,7 @@ export class ViewEditor extends React.Component<RendererProps> {
 		);
 
 		if (this._mouseData.isMousePressed) {
-			const s: number = 40;
+			const s = 40;
 			this._scene.camera.rotate(
 				s * this._mouseData.dragVec.y, 
 				s * this._mouseData.dragVec.x, 
@@ -158,10 +150,6 @@ export class ViewEditor extends React.Component<RendererProps> {
 
 		this._mouseData.prevPos = curPos;
 	}
-
-	onKeyDown(event: KeyboardEvent) {
-
-	}
 	
 
 	render(): React.ReactNode {
@@ -169,8 +157,7 @@ export class ViewEditor extends React.Component<RendererProps> {
 			<div className='renderer' ref={this._container}>
 				<canvas className='canvas' ref={this._canvas}></canvas>
 			</div>
-		)
+		);
 	}
 
 }
-ViewEditor.contextType = SceneContext;

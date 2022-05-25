@@ -1,7 +1,7 @@
-import { vec2, vec3, vec4, mat4 } from 'gl-matrix'
+import { vec2, vec3, vec4, mat4 } from 'gl-matrix';
 
-import { ShaderProgram } from './Shader'
-import { Texture } from './Texture'
+import { ShaderProgram } from './Shader';
+import { Texture } from './Texture';
 
 enum MaterialPropertyType {
 	SCALAR,
@@ -51,7 +51,7 @@ class Material {
 	}
 
 	clone(): Material {
-		let clone: Material = new Material(this.program.clone(), this._properties);
+		const clone: Material = new Material(this.program.clone(), this._properties);
 		return clone;
 	}
 }

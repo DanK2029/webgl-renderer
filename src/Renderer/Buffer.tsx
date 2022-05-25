@@ -45,7 +45,7 @@ class VertexBuffer {
 
 	clone(): VertexBuffer {
 		const clonedVertexLayout: VertexBufferLayout = this.layout.clone();
-		let clonedVertexBuffer = new VertexBuffer(this.vertices, clonedVertexLayout);
+		const clonedVertexBuffer = new VertexBuffer(this.vertices, clonedVertexLayout);
 		return clonedVertexBuffer;
 	}
 }
@@ -93,7 +93,7 @@ class IndexBuffer {
 	}
 
 	clone(): IndexBuffer {
-		let clonedIndexBuffer = new IndexBuffer(this.indices);
+		const clonedIndexBuffer = new IndexBuffer(this.indices);
 		return clonedIndexBuffer;
 	}
 }
@@ -132,7 +132,7 @@ class VertexBufferLayout {
 	}
 
 	clone(): VertexBufferLayout {
-		let clonedVertexBufferLayout: VertexBufferLayout = new VertexBufferLayout(this.layout);
+		const clonedVertexBufferLayout: VertexBufferLayout = new VertexBufferLayout(this.layout);
 		return clonedVertexBufferLayout;
 	}
 }
