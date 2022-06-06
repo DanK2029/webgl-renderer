@@ -77,7 +77,7 @@ const fragmentShader: Shader = new Shader(
 
 const shaderProgram: ShaderProgram = new ShaderProgram(vertexShader, fragmentShader);
 
-const material: Material = new Material(shaderProgram, [
+const material: Material = new Material('Empty Material', shaderProgram, [
 	{
 		type: MaterialPropertyType.VEC4,
 		name: 'color',

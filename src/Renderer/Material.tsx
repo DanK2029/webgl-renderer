@@ -1,4 +1,5 @@
 import { vec2, vec3, vec4, mat4 } from 'gl-matrix';
+import * as uniqid from 'uniqid';
 
 import { ShaderProgram } from './Shader';
 import { Texture } from './Texture';
@@ -22,12 +23,28 @@ interface MaterialProperty {
 
 class Material {
 
+	private _id: string;
+	private _name: string;
 	private _program: ShaderProgram;
 	private _properties: MaterialProperty[];
 
-	constructor(shaderProgram: ShaderProgram, properties: MaterialProperty[]) {
+	constructor(name: string, shaderProgram: ShaderProgram, properties: MaterialProperty[]) {
+		this._id = uniqid();
+		this._name = name;
 		this._program = shaderProgram;
 		this._properties = properties;
+	}
+
+	get id(): string {
+		return this._id;
+	}
+
+	get name(): string {
+		return this._name;
+	}
+
+	set name(name: string) {
+		this._name = name;
 	}
 
 	get program(): ShaderProgram {
@@ -51,7 +68,7 @@ class Material {
 	}
 
 	clone(): Material {
-		const clone: Material = new Material(this.program.clone(), this._properties);
+		const clone: Material = new Material(this.name, this.program.clone(), this._properties);
 		return clone;
 	}
 }

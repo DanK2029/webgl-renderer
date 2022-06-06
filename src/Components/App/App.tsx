@@ -8,6 +8,8 @@ import { SceneEditor } from '../SceneEditor/SceneEditor';
 import { ShaderEditor } from '../ShaderEditor/ShaderEditor';
 import { MaterialEditor } from '../MaterialEditor/MaterialEditor';
 
+import { Material } from '../../Renderer/Material';
+
 import 'bootstrap';
 import './App.scss';
 
@@ -19,6 +21,8 @@ enum EditorState {
 
 interface AppState {
 	editorState: EditorState;
+	materialLibrary: Record<string, Material>;
+
 }
 
 export default class App extends React.Component<Record<string, never>, AppState> {
@@ -33,7 +37,8 @@ export default class App extends React.Component<Record<string, never>, AppState
 		this._scene = new Scene(this._deltaTime);
 
 		this.state = {
-			editorState: EditorState.EDIT_SCENE
+			editorState: EditorState.EDIT_SCENE,
+			materialLibrary: {}
 		};
 	}
 
@@ -54,7 +59,7 @@ export default class App extends React.Component<Record<string, never>, AppState
 				return <ShaderEditor></ShaderEditor>;
 			
 			case EditorState.EDIT_MATERIAL:
-				return <MaterialEditor></MaterialEditor>;
+				return <MaterialEditor materialSet={this.state.materialLibrary}></MaterialEditor>;
 		}
 	}
 

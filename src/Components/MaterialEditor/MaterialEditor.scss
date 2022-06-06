@@ -1,15 +1,6 @@
 @import 'bootstrap';
 @import '../Styles/Colors.scss';
 
-.scene-editor {
-	height: 100%;
-	max-height: 100%;
-
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
-}
-
 .col-9 {
 	padding-left: 5px;
 	padding-right: 5px;
@@ -20,13 +11,14 @@
 	padding-right: 5px;
 }
 
-.scene-object-list {
+.material-list {
 	flex-grow: 1;
 	padding: 2px;
 	margin-top: 5px;
 
 	overflow-y: auto;
-
+	height: 100%;
+	
 	// border
 	border-radius: 5px;
 	border-color: $light-gray;
@@ -37,9 +29,33 @@
 	display: none;
 }
 
-#add-scene-object {
+.material-item {
+	@extend .btn;
+	@extend .btn-light;
+
 	width: 100%;
-	$button-color: $bright-green;
+	margin-bottom: 5px;
+
+	&:hover {
+		$button-color: $light-blue;
+		border-color: $button-color;
+		@include button-variant(
+			$button-color, 
+			darken($button-color, 7.5%), 
+			darken($button-color,  10%), 
+			lighten($button-color,  5%), 
+			lighten($button-color, 10%), 
+			darken($button-color,  30%)
+		);
+		color: $dark-gray !important;
+	}
+}
+
+#add-material {
+	@extend .btn;
+
+	width: 100%;
+	$button-color: $light-blue;
 	border-color: $button-color;
 	@include button-variant(
 		$button-color, 
