@@ -66,7 +66,7 @@ export default class App extends React.Component<Record<string, never>, AppState
 	render() {
 		return (
 			<div className='app-container'>
-				<nav className='navbar navbar-expand-lg app-navbar'>
+				<nav className='app-navbar'>
 					<div className='container-fluid'>
 						<span className='navbar-brand'>
 							<AiFillBug></AiFillBug>
@@ -95,7 +95,9 @@ export default class App extends React.Component<Record<string, never>, AppState
 					</div>
 				</nav>
 
-				{this.getEditorStateComponent()}
+				<div className='editor-container'>
+					{this.getEditorStateComponent()}
+				</div>
 			</div>
 		);
 	}
