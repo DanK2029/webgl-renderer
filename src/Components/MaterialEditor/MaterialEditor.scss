@@ -51,12 +51,11 @@
 	}
 }
 
-#add-material {
+.light-blue-btn {
 	@extend .btn;
 
-	width: 100%;
 	$button-color: $light-blue;
-	border-color: $button-color;
+	border-color: darken($button-color, 50%);
 	@include button-variant(
 		$button-color, 
 		darken($button-color, 7.5%), 
@@ -66,4 +65,29 @@
 		darken($button-color,  30%)
 	);
 	color: $dark-gray !important;
+}
+
+.full-width {
+	width: 100%;
+}
+
+.properties-header {
+	margin-right: 20px;
+}
+
+.no-material-alert {
+	text-align: center;
+	margin: auto;
+	margin-top: 10px;
+	width: 60%;
+}
+
+.material-editor-container {
+	padding: 10px;
+	padding-right: 20%;
+}
+
+.material-name {
+	padding-bottom: 5px;
+	border-bottom: 2px solid $dark-gray;
 }

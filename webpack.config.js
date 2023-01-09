@@ -5,6 +5,7 @@ module.exports = {
 	entry: './src/index.tsx',
 	output: {
 		filename: 'main.js',
+		// eslint-disable-next-line no-undef
 		path: path.resolve(__dirname, 'dist')
 	},
 	mode: 'development',
@@ -24,7 +25,7 @@ module.exports = {
 		rules: [
 			{
 				test: /\.css$/i,
-				use: ["style-loader", "css-loader"],
+				use: ['style-loader', 'css-loader'],
 			},
 			{
 				test: /\.m?js$/,
@@ -43,7 +44,7 @@ module.exports = {
 			},
 			{
 				test: /\.s[ac]ss$/i,
-				use: ["style-loader", "css-loader", "sass-loader"],
+				use: ['style-loader', 'css-loader', 'sass-loader'],
 			},
 		],
 	},

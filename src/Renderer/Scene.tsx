@@ -5,10 +5,12 @@ import { VertexBuffer, IndexBuffer } from './Buffer';
 import { Material, MaterialProperty, MaterialPropertyType } from './Material';
 import { Texture } from './Texture';
 
-type UpdateFunction = (time: number, object: SceneObject | Camera) => void | (() => undefined);
+type UpdateFunction = (
+	time: number,
+	object: SceneObject | Camera
+) => void | (() => undefined);
 
 class Scene {
-
 	private _objectList: SceneObject[];
 	private _camera: Camera;
 	private _backgroundColor: vec4;
@@ -62,9 +64,9 @@ class Scene {
 	}
 
 	deleteObject(id: string) {
-		this._objectList = this._objectList.filter((obj: SceneObject) => (
-			obj.id !== id
-		));
+		this._objectList = this._objectList.filter(
+			(obj: SceneObject) => obj.id !== id
+		);
 	}
 
 	tick(): void {
@@ -92,7 +94,6 @@ class Scene {
 }
 
 class SceneObject {
-
 	private _name: string;
 	private _id: string;
 	private _vertexBuffer: VertexBuffer;
@@ -104,7 +105,11 @@ class SceneObject {
 	private _transform: mat4;
 	private _updateFunction: UpdateFunction;
 
-	constructor(vertexBuffer: VertexBuffer, indexBuffer: IndexBuffer, material: Material) {
+	constructor(
+		vertexBuffer: VertexBuffer,
+		indexBuffer: IndexBuffer,
+		material: Material
+	) {
 		this._id = uniqid();
 		this._vertexBuffer = vertexBuffer;
 		this._indexBuffer = indexBuffer;
@@ -180,7 +185,7 @@ class SceneObject {
 		this._rotation = [
 			this._rotation[0] + dx,
 			this._rotation[1] + dy,
-			this._rotation[2] + dz
+			this._rotation[2] + dz,
 		];
 	}
 
@@ -190,8 +195,18 @@ class SceneObject {
 	}
 
 	get transform(): mat4 {
-		const rotation: quat = quat.fromEuler(quat.create(), this.rotation[0], this.rotation[1], this.rotation[2]);
-		return mat4.fromRotationTranslationScale(this._transform, rotation, this.translation, this.scale);
+		const rotation: quat = quat.fromEuler(
+			quat.create(),
+			this.rotation[0],
+			this.rotation[1],
+			this.rotation[2]
+		);
+		return mat4.fromRotationTranslationScale(
+			this._transform,
+			rotation,
+			this.translation,
+			this.scale
+		);
 	}
 
 	get updateFunction(): UpdateFunction {
@@ -203,7 +218,11 @@ class SceneObject {
 	}
 
 	clone(): SceneObject {
-		const clone = new SceneObject(this.vertexBuffer.clone(), this.indexBuffer.clone(), this.material.clone());
+		const clone = new SceneObject(
+			this.vertexBuffer.clone(),
+			this.indexBuffer.clone(),
+			this.material.clone()
+		);
 		clone.name = this.name;
 		clone.translation = Array.from(this.translation) as vec3;
 		clone.scale = Array.from(this.scale) as vec3;
@@ -219,7 +238,7 @@ class SceneObject {
 		this._material.program.created = false;
 		this._material.program.vertexShader.created = false;
 		this._material.program.fragmentShader.created = false;
-		
+
 		this._material.properties.forEach((prop: MaterialProperty) => {
 			switch (prop.type) {
 				case MaterialPropertyType.TEXTURE: {
@@ -234,7 +253,6 @@ class SceneObject {
 }
 
 class Camera {
-
 	private _aspectRatio: number;
 	private _perspectiveMatrix: mat4;
 	private _viewMatrix: mat4;
@@ -245,7 +263,13 @@ class Camera {
 
 	constructor(aspectRatio: number, fovy: number, near: number, far: number) {
 		this._aspectRatio = aspectRatio;
-		this._perspectiveMatrix = mat4.perspective(mat4.create(), glMatrix.toRadian(fovy), this._aspectRatio, near, far);
+		this._perspectiveMatrix = mat4.perspective(
+			mat4.create(),
+			glMatrix.toRadian(fovy),
+			this._aspectRatio,
+			near,
+			far
+		);
 		this._translation = vec3.create();
 		this._viewMatrix = mat4.create();
 		this._rotation = [0, 0, 0];
@@ -266,8 +290,17 @@ class Camera {
 	}
 
 	get viewMatrix(): mat4 {
-		const rotation: quat = quat.fromEuler(quat.create(), this._rotation[0], this._rotation[1], this._rotation[2]);
-		mat4.fromRotationTranslation(this._transform, rotation, this._translation);
+		const rotation: quat = quat.fromEuler(
+			quat.create(),
+			this._rotation[0],
+			this._rotation[1],
+			this._rotation[2]
+		);
+		mat4.fromRotationTranslation(
+			this._transform,
+			rotation,
+			this._translation
+		);
 		return mat4.invert(this._viewMatrix, this._transform);
 	}
 
@@ -291,13 +324,22 @@ class Camera {
 		this._rotation = [
 			this._rotation[0] + dx,
 			this._rotation[1] + dy,
-			this._rotation[2] + dz
+			this._rotation[2] + dz,
 		];
-	}	
+	}
 
 	get transform(): mat4 {
-		const r: quat = quat.fromEuler(quat.create(), this._rotation[0], this._rotation[1], this._rotation[2]);
-		return mat4.fromRotationTranslation(this._transform, r, this.translation);
+		const r: quat = quat.fromEuler(
+			quat.create(),
+			this._rotation[0],
+			this._rotation[1],
+			this._rotation[2]
+		);
+		return mat4.fromRotationTranslation(
+			this._transform,
+			r,
+			this.translation
+		);
 	}
 
 	set updateFunction(updateFuntion: UpdateFunction) {

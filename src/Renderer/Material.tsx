@@ -13,7 +13,7 @@ enum MaterialPropertyType {
 	TEXTURE
 }
 
-type MaterialPropertyValue = number | vec2 | vec3 | vec4 | mat4 | Texture;
+type MaterialPropertyValue = [number] | vec2 | vec3 | vec4 | mat4 | Texture;
 
 interface MaterialProperty {
 	type: MaterialPropertyType,

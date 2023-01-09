@@ -1,6 +1,12 @@
 import { vec2, vec3 } from 'gl-matrix';
 
-import { IndexBuffer, VertexBuffer, VertexBufferLayout, VertexTypes, VertexLayout } from '../Renderer/Buffer';
+import {
+	IndexBuffer,
+	VertexBuffer,
+	VertexBufferLayout,
+	VertexTypes,
+	VertexLayout,
+} from '../Renderer/Buffer';
 import { SceneObject } from '../Renderer/Scene';
 
 import { cube } from '../res/TestObjects/Cube';
@@ -17,17 +23,17 @@ const enum OBJ_FILE_KEYWORDS {
 	USE_MATERIAL = 'usemtl',
 	OBJECT = 'o',
 	GROUP = 'g',
-	SMOOTHING = 's'
+	SMOOTHING = 's',
 }
 
 interface FaceVertex {
 	vertexIndex: number;
 	vertexData: vec3;
-	textureCoordIndex: number;
-	textureCoordData: vec2;
-	normalIndex: number;
-	normalData: vec3;
-	index: number;
+	textureCoordIndex?: number | undefined;
+	textureCoordData?: vec2 | undefined;
+	normalIndex?: number | undefined;
+	normalData?: vec3 | undefined;
+	index?: number | undefined;
 }
 
 interface FaceTriangle {
@@ -48,7 +54,6 @@ interface ObjVertexLists {
 }
 
 class ObjFileReader {
-
 	private _layout: VertexBufferLayout;
 	private _indices: number[];
 
@@ -91,9 +96,10 @@ class ObjFileReader {
 					name: layout.name,
 					size: layout.size,
 					type: layout.type,
-					normalized: layout.normalized
+					normalized: layout.normalized,
 				};
-			}));
+			})
+		);
 
 		this.reset();
 	}
@@ -106,18 +112,26 @@ class ObjFileReader {
 		data.split('\n').forEach((line: string) => {
 			line && this.parseLine(line.trim());
 		});
-		
+
 		const sceneObject: SceneObject = cube.clone();
 		sceneObject.name = name;
 		sceneObject.vertexBuffer = this.createVertexBuffer();
-		sceneObject.indexBuffer = new IndexBuffer(new Uint32Array(this._indices));
+		sceneObject.indexBuffer = new IndexBuffer(
+			new Uint32Array(this._indices)
+		);
+
+		sceneObject.updateFunction = (t: number, obj: SceneObject) => {
+			console.log(obj.id);
+		};
 
 		return sceneObject;
 	}
 
 	private createVertexBuffer(): VertexBuffer {
 		const vertices: number[] = Object.values(this._globalVertexMap)
-			.sort((v1: FaceVertex, v2: FaceVertex) => v1.index < v2.index ? -1 : 1)
+			.sort((v1: FaceVertex, v2: FaceVertex) =>
+				v1.index < v2.index ? -1 : 1
+			)
 			.flatMap((v: FaceVertex) => {
 				const vertexData: number[] = [];
 
@@ -125,9 +139,11 @@ class ObjFileReader {
 				const textureCoordData = v.textureCoordData as number[];
 				const normalData = v.normalData as number[];
 
-				positionData ? vertexData.push(...positionData) : [0, 0, 0];
-				textureCoordData ? vertexData.push(...textureCoordData) : [0, 0];
-				normalData ? vertexData.push(...normalData) : [0, 0, 0];
+				vertexData.push(...(positionData ? positionData : [0, 0, 0]));
+				vertexData.push(
+					...(textureCoordData ? textureCoordData : [0, 0])
+				);
+				vertexData.push(...(normalData ? normalData : [0, 0, 0]));
 
 				return vertexData;
 			});
@@ -137,14 +153,14 @@ class ObjFileReader {
 
 	public parseLine(line: string) {
 		const tokens: string[] = line.replace(/\s\s+/g, ' ').split(' ');
-		tokens.forEach(token => token.trim());
+		tokens.forEach((token) => token.trim());
 		const lineType = tokens[0];
-		
-		switch(lineType) {
+
+		switch (lineType) {
 			case OBJ_FILE_KEYWORDS.COMMENT:
 				// console.log('Parsing comment...');
 				break;
-			
+
 			case OBJ_FILE_KEYWORDS.VERTEX:
 				// console.log('Parsing vertex...');
 				this.addVertex(tokens[1], tokens[2], tokens[3]);
@@ -153,41 +169,41 @@ class ObjFileReader {
 			case OBJ_FILE_KEYWORDS.TEXTURE_COORD:
 				this.addTextureCoord(tokens[1], tokens[2]);
 				break;
-			
+
 			case OBJ_FILE_KEYWORDS.VERTEX_NORMAL:
 				// console.log('Parsing normal...');
 				this.addNormal(tokens[1], tokens[2], tokens[3]);
 				break;
-			
+
 			case OBJ_FILE_KEYWORDS.VERTEX_PARAMETER:
 				// console.log('Parsing parameter...');
 				break;
-			
+
 			case OBJ_FILE_KEYWORDS.FACE:
 				// console.log('Parsing face...');
 				this.addFace(tokens.slice(1));
 				break;
-			
+
 			case OBJ_FILE_KEYWORDS.LINE:
 				// console.log('Parsing line...');
 				break;
-	
+
 			case OBJ_FILE_KEYWORDS.DEFINE_MATERIAL:
 				// console.log('Parsing define material...');
 				break;
-	
+
 			case OBJ_FILE_KEYWORDS.USE_MATERIAL:
 				// console.log('Parsing use material...');
 				break;
-			
+
 			case OBJ_FILE_KEYWORDS.OBJECT:
 				// console.log('Parsing object...');
 				break;
-	
+
 			case OBJ_FILE_KEYWORDS.GROUP:
 				// console.log('Parsing group...');
 				break;
-	
+
 			case OBJ_FILE_KEYWORDS.SMOOTHING:
 				// console.log('Parsing smoothing...');
 				break;
@@ -195,21 +211,26 @@ class ObjFileReader {
 	}
 
 	private addVertex(x: string, y: string, z: string) {
-		this._vertexLists.position.list.push(
-			[Number.parseFloat(x), Number.parseFloat(y), Number.parseFloat(z)]
-		);
+		this._vertexLists.position.list.push([
+			Number.parseFloat(x),
+			Number.parseFloat(y),
+			Number.parseFloat(z),
+		]);
 	}
 
 	private addTextureCoord(u: string, v: string) {
-		this._vertexLists.texCoord.list.push(
-			[Number.parseFloat(u), 1 - Number.parseFloat(v)]
-		);
+		this._vertexLists.texCoord.list.push([
+			Number.parseFloat(u),
+			1 - Number.parseFloat(v),
+		]);
 	}
 
 	private addNormal(x: string, y: string, z: string) {
-		this._vertexLists.normal.list.push(
-			[Number.parseFloat(x), Number.parseFloat(y), Number.parseFloat(z)]
-		);
+		this._vertexLists.normal.list.push([
+			Number.parseFloat(x),
+			Number.parseFloat(y),
+			Number.parseFloat(z),
+		]);
 	}
 
 	private addFace(indices: string[]): void {
@@ -217,7 +238,7 @@ class ObjFileReader {
 		const faceVertices: FaceVertex[] = indices.map((token: string) => {
 			return this.parseFaceToken(token);
 		});
-		
+
 		let triangles: FaceTriangle[] = [];
 		if (numIndices < 3) {
 			console.error('Face has less than 3 vertices!');
@@ -259,7 +280,7 @@ class ObjFileReader {
 		for (let i = 2; i < faceVertices.length; i++) {
 			trianlges.push({
 				v2: faceVertices[i],
-				v1: faceVertices[i-1],
+				v1: faceVertices[i - 1],
 				v0: rootVertex,
 			});
 		}
@@ -268,39 +289,43 @@ class ObjFileReader {
 
 	private parseFaceToken(token: string): FaceVertex {
 		const values: string[] = token.split('/');
-		if (values.length < 3) {
-			throw new Error('Face token not enough values to parse correctly!');
-		}
-
-		const vertexIndex: number = values[0] ? Number.parseFloat(values[0]) - 1 : undefined;
-		const vertexData: vec3 = vertexIndex !== undefined 
-			? this._vertexLists.position.list[vertexIndex] as vec3 
-			: undefined;
-
-		const textureIndex: number = values[1] ? Number.parseFloat(values[1]) - 1 : undefined;
-		const textureData: vec2 = textureIndex !== undefined 
-			? this._vertexLists.texCoord.list[textureIndex] as vec2 
-			: undefined;
-
-		const normalIndex: number = values[2] ? Number.parseFloat(values[2]) - 1 : undefined;
-		const normalData: vec3 = normalIndex !== undefined 
-			? this._vertexLists.normal.list[vertexIndex] as vec3 
-			: undefined;
 
 		const vertex: FaceVertex = {
-			vertexIndex: vertexIndex,
-			vertexData: vertexData,
-			textureCoordIndex: textureIndex,
-			textureCoordData: textureData,
-			normalIndex: normalIndex,
-			normalData: normalData,
-			index: undefined,
+			vertexIndex: -1,
+			vertexData: [undefined, undefined, undefined],
 		};
+
+		vertex.vertexIndex = values[0]
+			? Number.parseFloat(values[0]) - 1
+			: undefined;
+
+		vertex.vertexData =
+			vertex.vertexIndex !== undefined
+				? (this._vertexLists.position.list[vertex.vertexIndex] as vec3)
+				: undefined;
+
+		vertex.textureCoordIndex = values[1]
+			? Number.parseFloat(values[1]) - 1
+			: undefined;
+
+		vertex.textureCoordData =
+			vertex.textureCoordIndex !== undefined
+				? (this._vertexLists.texCoord.list[
+						vertex.textureCoordIndex
+				  ] as vec2)
+				: undefined;
+
+		vertex.normalIndex = values[2]
+			? Number.parseFloat(values[2]) - 1
+			: undefined;
+
+		vertex.normalData =
+			vertex.normalIndex !== undefined
+				? (this._vertexLists.normal.list[vertex.vertexIndex] as vec3)
+				: undefined;
 
 		return vertex;
 	}
-
 }
-
 
 export { ObjFileReader };
