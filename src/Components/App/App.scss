@@ -44,6 +44,54 @@ body {
 	margin: 0px 5px 0px 5px;
 }
 
+.load-scene-button {
+	@extend .btn;
+
+	$button-color: $white;
+	border-color: $button-color;
+	@include button-variant(
+		$button-color, 
+		darken($button-color, 7.5%), 
+		darken($button-color,  10%), 
+		lighten($button-color,  5%), 
+		lighten($button-color, 10%), 
+		darken($button-color,  30%)
+	);
+	color: $dark-gray !important;
+
+	padding: 5px;
+	margin: 5px;
+
+	float: right;
+	:hover {
+		cursor: pointer;
+	}
+}
+
+.save-scene-button {
+	@extend .btn;
+
+	$button-color: $light-blue;
+	border-color: $button-color;
+	@include button-variant(
+		$button-color, 
+		darken($button-color, 7.5%), 
+		darken($button-color,  10%), 
+		lighten($button-color,  5%), 
+		lighten($button-color, 10%), 
+		darken($button-color,  30%)
+	);
+	color: $dark-gray !important;
+
+	padding: 5px;
+	margin: 5px;
+
+	float: right;
+	:hover {
+		cursor: pointer;
+	}
+}
+
 .editor-container {
 	padding-top: 5px;
 	padding-bottom: 15px;

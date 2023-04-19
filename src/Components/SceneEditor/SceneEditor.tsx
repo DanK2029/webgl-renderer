@@ -14,7 +14,6 @@ interface SceneEditorProps {
 }
 
 class SceneEditor extends React.Component<SceneEditorProps> {
-
 	private _scene: Scene;
 
 	constructor(props: SceneEditorProps) {
@@ -43,30 +42,38 @@ class SceneEditor extends React.Component<SceneEditorProps> {
 
 	render() {
 		return (
-			<div className='container-fluid'>
-				<div className='row'>
-					<div className='col-9'>
+			<div className="container-fluid">
+				<div className="row">
+					<div className="col-9">
 						<ViewEditor scene={this._scene}></ViewEditor>
 					</div>
-					<div className='col-3'>
-						<div className='scene-editor'>
-							<button 
-								id='add-scene-object' 
-								className='btn btn-primary' 
-								onClick={() => this.addSceneObject.bind(this)('New Scene Object')}
+					<div className="col-3">
+						<div className="scene-editor">
+							<button
+								id="add-scene-object"
+								className="btn btn-primary"
+								onClick={() =>
+									this.addSceneObject.bind(this)(
+										'New Scene Object'
+									)
+								}
 							>
 								Add Object
 							</button>
 
-							<div className='scene-object-list' onClick={() => console.log(this._scene)}>
-								{this._scene && this._scene.objectList.map((obj: SceneObject) => (
-									<SceneObjectEditor 
-										key={obj.id} 
-										object={obj} 
-										onDeleteSceneObject={this.deleteSceneObject.bind(this)}
-									>
-									</SceneObjectEditor>
-								))}
+							<div className="scene-object-list">
+								{this._scene &&
+									this._scene.objectList.map(
+										(obj: SceneObject) => (
+											<SceneObjectEditor
+												key={obj.id}
+												object={obj}
+												onDeleteSceneObject={this.deleteSceneObject.bind(
+													this
+												)}
+											></SceneObjectEditor>
+										)
+									)}
 							</div>
 						</div>
 					</div>

@@ -31,6 +31,8 @@ export default class App extends React.Component<
 	private _deltaTime: number;
 	private _scene: Scene;
 
+	private _loadSceneRef = React.createRef<HTMLInputElement>();
+
 	constructor(props: Record<string, never>) {
 		super(props);
 
@@ -64,6 +66,20 @@ export default class App extends React.Component<
 					></MaterialEditor>
 				);
 		}
+	}
+
+	private loadScene(file: File) {
+		const fileReader = new FileReader();
+		fileReader.readAsText(file);
+		fileReader.onload = () => {
+			const data: string = fileReader.result as string;
+			const scene: Scene = JSON.parse(data);
+			console.log(scene);
+		};
+	}
+
+	private saveScene() {
+		console.log('saving scene...');
 	}
 
 	render() {
@@ -112,6 +128,25 @@ export default class App extends React.Component<
 									</span>
 								</li>
 							</ul>
+						</div>
+						<div>
+							<button
+								type="button"
+								className="load-scene-button"
+								onClick={() => {
+									this._loadSceneRef.current.click();
+								}}
+							>
+								Load Scene
+							</button>
+							<input
+								type="file"
+								ref={this._loadSceneRef}
+								style={{ display: 'none' }}
+								onChange={(event) => {
+									this.loadScene(event.target.files[0]);
+								}}
+							/>
 						</div>
 					</div>
 				</nav>

@@ -4,6 +4,7 @@ import { Camera, Scene, SceneObject } from './../../Renderer/Scene';
 import { Renderer } from './../../Renderer/Renderer';
 
 import './ViewEditor.scss';
+import { vec3 } from 'gl-matrix';
 
 interface Point {
 	x: number;
@@ -23,7 +24,6 @@ interface RendererProps {
 }
 
 export class ViewEditor extends React.Component<RendererProps> {
-
 	private _gl: WebGL2RenderingContext;
 	private _renderer: Renderer;
 	private _scene: Scene;
@@ -42,11 +42,11 @@ export class ViewEditor extends React.Component<RendererProps> {
 		this._canvas = React.createRef<HTMLCanvasElement>();
 		this._container = React.createRef<HTMLDivElement>();
 		this._mouseData = {
-			prevPos: {x: 0, y: 0},
-			curPos: {x: 0, y: 0},
+			prevPos: { x: 0, y: 0 },
+			curPos: { x: 0, y: 0 },
 			isMousePressed: false,
 			dragDist: 0,
-			dragVec: {x: 0, y: 0},
+			dragVec: { x: 0, y: 0 },
 		} as MouseEventData;
 	}
 
@@ -57,15 +57,38 @@ export class ViewEditor extends React.Component<RendererProps> {
 		}
 		this._renderer = new Renderer(this._gl);
 
-		this._container.current.addEventListener('mouseup', this.onMouseUp.bind(this));
-		this._container.current.addEventListener('mousedown', this.onMouseDown.bind(this));
-		this._container.current.addEventListener('mousemove', this.onMouseMove.bind(this));
+		this._canvas.current.addEventListener(
+			'mouseup',
+			this.onMouseUp.bind(this)
+		);
+		this._canvas.current.addEventListener(
+			'mousedown',
+			this.onMouseDown.bind(this)
+		);
+		this._canvas.current.addEventListener(
+			'mousemove',
+			this.onMouseMove.bind(this)
+		);
 
-		const { width, height } = this._container.current.getBoundingClientRect();
-		this.resizeCanvas(width, height);		
-		this._canvas.current.addEventListener('resize', this.onResize.bind(this));
+		this._canvas.current.addEventListener(
+			'keypress',
+			this.onKeyPress.bind(this)
+		);
 
-		const camera: Camera = new Camera(width/height, 45, 0.001, 1000);
+		this._canvas.current.addEventListener(
+			'keypress',
+			this.onKeyPress.bind(this)
+		);
+
+		const { width, height } =
+			this._container.current.getBoundingClientRect();
+		this.resizeCanvas(width, height);
+		this._canvas.current.addEventListener(
+			'resize',
+			this.onResize.bind(this)
+		);
+
+		const camera: Camera = new Camera(width / height, 45, 0.001, 1000);
 		camera.translation = [0, 0, 5];
 		this._scene.camera = camera;
 
@@ -92,16 +115,17 @@ export class ViewEditor extends React.Component<RendererProps> {
 
 	normalizeMouseCoord(point: Point) {
 		return {
-			x: -(2 * point.x / this._canvas.current.width) - 1.0,
-			y: -(2 * point.y / this._canvas.current.height) - 1.0,
+			x: -((2 * point.x) / this._canvas.current.width) - 1.0,
+			y: -((2 * point.y) / this._canvas.current.height) - 1.0,
 		};
 	}
-	
+
 	onMouseDown(event: MouseEvent) {
 		this._mouseData.isMousePressed = true;
-		this._mouseData.curPos = this.normalizeMouseCoord(
-			{x: event.x, y: event.y} as Point
-		);
+		this._mouseData.curPos = this.normalizeMouseCoord({
+			x: event.x,
+			y: event.y,
+		} as Point);
 	}
 
 	onMouseUp() {
@@ -112,52 +136,83 @@ export class ViewEditor extends React.Component<RendererProps> {
 
 		this._mouseData.dragVec = {
 			x: prevPos.x - curPos.y,
-			y: prevPos.x - curPos.y
+			y: prevPos.x - curPos.y,
 		} as Point;
 
 		this._mouseData.dragDist = Math.sqrt(
-			Math.pow(this._mouseData.dragVec.x, 2) + Math.pow(this._mouseData.dragVec.x, 2)
+			Math.pow(this._mouseData.dragVec.x, 2) +
+				Math.pow(this._mouseData.dragVec.x, 2)
 		);
-		
+
 		this._mouseData.dragDist = 0;
 	}
 
 	onMouseMove(event: MouseEvent) {
-		const pos: Point = this.normalizeMouseCoord(
-			{x: event.x, y: event.y} as Point
-		);
+		const pos: Point = this.normalizeMouseCoord({
+			x: event.x,
+			y: event.y,
+		} as Point);
 		this._mouseData.curPos = pos;
 		const prevPos = this._mouseData.prevPos;
 
 		const curPos = this._mouseData.curPos;
 		this._mouseData.dragVec = {
 			x: prevPos.x - curPos.x,
-			y: prevPos.y - curPos.y
+			y: prevPos.y - curPos.y,
 		} as Point;
 
 		this._mouseData.dragDist = Math.sqrt(
-			Math.pow(this._mouseData.dragVec.x, 2) + Math.pow(this._mouseData.dragVec.x, 2)
+			Math.pow(this._mouseData.dragVec.x, 2) +
+				Math.pow(this._mouseData.dragVec.x, 2)
 		);
 
 		if (this._mouseData.isMousePressed) {
 			const s = 40;
 			this._scene.camera.rotate(
-				s * this._mouseData.dragVec.y, 
-				s * this._mouseData.dragVec.x, 
+				s * this._mouseData.dragVec.y,
+				s * this._mouseData.dragVec.x,
 				s * 0
 			);
 		}
 
 		this._mouseData.prevPos = curPos;
 	}
-	
+
+	onKeyPress(event: React.KeyboardEvent) {
+		const moveValue = 1;
+		const key: string = event.key;
+
+		if (key === 'w') {
+			this.moveCamera([0, moveValue, 0]);
+		}
+		if (key === 's') {
+			this.moveCamera([0, -moveValue, 0]);
+		}
+		if (key === 'a') {
+			this.moveCamera([-moveValue, 0, 0]);
+		}
+		if (key === 'd') {
+			this.moveCamera([moveValue, 0, 0]);
+		}
+	}
+
+	moveCamera(moveVec: vec3) {
+		this._scene.camera.translation = [
+			this._scene.camera.translation[0] + moveVec[0],
+			this._scene.camera.translation[1] + moveVec[1],
+			this._scene.camera.translation[2] + moveVec[2],
+		];
+	}
 
 	render(): React.ReactNode {
 		return (
-			<div className='renderer' ref={this._container}>
-				<canvas className='canvas' ref={this._canvas}></canvas>
+			<div className="renderer" ref={this._container}>
+				<canvas
+					className="canvas"
+					ref={this._canvas}
+					tabIndex={0}
+				></canvas>
 			</div>
 		);
 	}
-
 }

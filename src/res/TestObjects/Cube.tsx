@@ -6,7 +6,7 @@ import {
 } from '../../Renderer/Buffer';
 import { Shader, ShaderProgram, ShaderType } from '../../Renderer/Shader';
 import { Material, MaterialPropertyType } from '../../Renderer/Material';
-import { Scene, SceneObject } from '../../Renderer/Scene';
+import { SceneObject } from '../../Renderer/Scene';
 
 const vertexBuffer: VertexBuffer = new VertexBuffer(
 	new Float32Array([

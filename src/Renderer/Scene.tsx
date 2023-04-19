@@ -1,7 +1,7 @@
 import { vec3, vec4, mat4, quat, glMatrix } from 'gl-matrix';
 import * as uniqid from 'uniqid';
 
-import { VertexBuffer, IndexBuffer } from './Buffer';
+import { VertexBuffer, IndexBuffer, VertexBufferLayout } from './Buffer';
 import { Material, MaterialProperty, MaterialPropertyType } from './Material';
 import { Texture } from './Texture';
 
